@@ -203,13 +203,16 @@ export default {
             idPlanilhaItens: this.$route.params.idPlanilhaItens,
 
             snackbar: false,
+            acao: '',
+            mensagemFinal: {},
         };
     },
     computed: {
         ...mapGetters({
             getDadosProjeto: 'avaliacaoResultados/getDadosProjeto',
             getDadosItem: 'avaliacaoResultados/getDadosItem',
-            status: 'avaliacaoResultados/statusCriarComprovante',
+            statusCriarComprovante: 'avaliacaoResultados/statusCriarComprovante',
+            statusExcluirComprovante: 'avaliacaoResultados/statusExcluirComprovante',
         }),
         dadosProjeto() {
             return this.getDadosProjeto;
@@ -230,22 +233,30 @@ export default {
         valorComprovar() {
             return this.dadosItem.vlAprovado - this.dadosItem.vlComprovado;
         },
-        mensagemFinal() {
-            const sucesso = {
-                msg: 'Comprovante criado com sucesso!',
+        mensagemSucesso() {
+            return {
+                msg: `Comprovante ${this.acao} com sucesso!`,
                 icon: 'done',
                 color: 'success',
             };
-            const falha = {
-                msg: 'Houve um problema ao tentar criar o comprovante, tente novamente mais tarde.',
+        },
+        mensagemFalha() {
+            return {
+                msg: `Houve um problema ao tentar ${this.acao} o comprovante, tente novamente mais tarde.`,
                 icon: 'warning',
                 color: 'error',
             };
-            return this.status.success ? sucesso : falha;
         },
     },
     watch: {
-        status() {
+        statusCriarComprovante(status) {
+            this.acao = status.success ? 'criado' : 'criar';
+            this.mensagemFinal = status.success ? this.mensagemSucesso : this.mensagemFalha;
+            this.snackbar = true;
+        },
+        statusExcluirComprovante(status) {
+            this.acao = status.success ? 'excluído' : 'excluir';
+            this.mensagemFinal = status.success ? this.mensagemSucesso : this.mensagemFalha;
             this.snackbar = true;
         },
     },

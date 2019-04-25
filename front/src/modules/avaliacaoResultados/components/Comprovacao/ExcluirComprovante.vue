@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
     props: {
@@ -55,13 +55,22 @@ export default {
             dialog: false,
         };
     },
+    computed: {
+        ...mapGetters({
+            status: 'avaliacaoResultados/statusExcluirComprovante',
+        }),
+    },
+    watch: {
+        status() {
+            this.$root.$emit('recarregar-comprovantes');
+        },
+    },
     methods: {
         ...mapActions({
             excluirComprovante: 'avaliacaoResultados/excluirComprovante',
         }),
         confirmarExclusao(idComprovantePagamento) {
             this.excluirComprovante({ 'comprovante[idComprovantePagamento]': idComprovantePagamento });
-            this.$root.$emit('recarregar-comprovantes');
             this.dialog = false;
         },
     },
