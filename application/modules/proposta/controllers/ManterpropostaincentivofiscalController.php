@@ -150,17 +150,21 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
 
         $agencia = $this->getParam('agencia');
 
-        if ($agencia > 0) {
-            $tblProposta = new Proposta_Model_DbTable_PreProjeto();
-            $agencia = $tblProposta->buscaragencia($agencia);
-            if (count($agencia) > 0) {
-                echo "";
-            } else {
-                echo "Ag&ecirc;ncia do Banco do Brasil n&atilde;o encontrada!";
-            }
-        } else {
-            echo "Ag&ecirc;ncia inv&aacute;lida";
+        if (!$this->isAgenciaValida($agencia)) {
+            echo "Ag&ecirc;ncia do Banco do Brasil inv&aacute;lida ou n&atilde;o encontrada";
         }
+    }
+
+    private function isAgenciaValida($agencia)
+    {
+        if (empty($agencia) || strlen($agencia) < 5) {
+            return false;
+        }
+
+        $tblProposta = new Proposta_Model_DbTable_PreProjeto();
+        $agencia = $tblProposta->buscaragencia($agencia);
+
+        return count($agencia) > 0;
     }
 
     /**
@@ -259,16 +263,13 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
 
         $dados['idpreprojeto'] = $idPreProjeto;
 
+        $mesagem = "Cadastro realizado com sucesso!";
         if (!empty($idPreProjeto)) {
             $mesagem = "Altera&ccedil;&atilde;o realizada com sucesso!";
-        } else {
-            $mesagem = "Cadastro realizado com sucesso!";
         }
 
-        //instancia classe modelo
         $tblPreProjeto = new Proposta_Model_DbTable_PreProjeto();
         try {
-            //persiste os dados do Pre Projeto
             $idPreProjeto = $tblPreProjeto->salvar($dados);
             $this->view->idPreProjeto = $idPreProjeto;
 
