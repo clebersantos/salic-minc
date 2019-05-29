@@ -43,3 +43,4 @@ export const getProjetosSimilares = state => state.projetosSimilares;
 export const buscarAgente = state => state.agente;
 export const statusCriarComprovante = state => state.statusCriarComprovante;
 export const statusExcluirComprovante = state => state.statusExcluirComprovante;
+export const dadosEdicaoComprovante = state => state.dadosEdicaoComprovante;

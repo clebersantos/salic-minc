@@ -55,6 +55,7 @@ export const state = {
     agente: [],
     statusCriarComprovante: {},
     statusExcluirComprovante: {},
+    dadosEdicaoComprovante: {},
 };
 
 export const mutations = {
@@ -274,5 +275,8 @@ export const mutations = {
     },
     [types.STATUS_EXCLUIR_COMPROVANTE](state, dados) {
         state.statusExcluirComprovante = dados;
+    },
+    [types.DADOS_EDICAO_COMPROVANTE](state, dados) {
+        state.dadosEdicaoComprovante = dados;
     },
 };

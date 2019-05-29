@@ -124,6 +124,7 @@
                     :id-uf="String(idUf)"
                     :cidade="String(cidade)"
                     :etapa="String(etapa)"
+                    :valor-comprovar="valorComprovar | moedaFilter"
                     tipo="nacional"
                 />
             </v-card-text>
@@ -142,6 +143,7 @@
                     :id-uf="String(idUf)"
                     :cidade="String(cidade)"
                     :etapa="String(etapa)"
+                    :valor-comprovar="valorComprovar | moedaFilter"
                     tipo="internacional"
                 />
             </v-card-text>

@@ -3,18 +3,24 @@
         v-model="dialog"
         scrollable
     >
-        <v-btn
+        <v-tooltip
             slot="activator"
-            color="teal"
-            dark
-            fixed
-            bottom
-            right
-            fab
-            @click="valid = true"
+            left
         >
-            <v-icon>add</v-icon>
-        </v-btn>
+            <v-btn
+                slot="activator"
+                color="teal"
+                dark
+                fixed
+                bottom
+                right
+                fab
+                @click="valid = true"
+            >
+                <v-icon>add</v-icon>
+            </v-btn>
+            <span>Criar Comprovante</span>
+        </v-tooltip>
         <v-card>
             <v-toolbar
                 dark
@@ -298,7 +304,7 @@
                                 <v-text-field
                                     v-money="money"
                                     id="valor"
-                                    :hint="`*Atual: R$ ${valorAtual} / Máx: R$ ${valorComprovar}`"
+                                    :hint="`*Máximo: R$ ${valorComprovar}`"
                                     :rules="valorRules"
                                     v-model.lazy="valor"
                                     label="VALOR *"
@@ -376,7 +382,6 @@ export default {
         dataInicio: { type: String, default: '' },
         dataFim: { type: String, default: '' },
         valorComprovar: { type: String, default: '0' },
-        valorAtual: { type: String, default: (0).toFixed(2) },
     },
     data() {
         return {
@@ -454,6 +459,7 @@ export default {
         ...mapGetters({
             agente: 'avaliacaoResultados/buscarAgente',
             status: 'avaliacaoResultados/statusCriarComprovante',
+            dadosEdicaoComprovante: 'avaliacaoResultados/dadosEdicaoComprovante',
         }),
         cpfCnpjMask() {
             return this.cpfCnpjLabel === 'CNPJ' ? this.cnpjMask : this.cpfMask;
@@ -524,6 +530,9 @@ export default {
             this.$root.$emit('recarregar-comprovantes');
         },
     },
+    mounted() {
+        this.$root.$on('editar-comprovante', () => this.editarComprovante());
+    },
     methods: {
         ...mapActions({
             buscarAgente: 'avaliacaoResultados/buscarAgente',
@@ -565,7 +574,28 @@ export default {
             let string = number.replace(/R\$ /g, ''); // Retira prefixo R$
             string = string.replace(/\./g, ''); // Retira pontos
             string = string.replace(/,/g, '.'); // Transforma vírgulas em pontos
-            return parseFloat(string);
+            return Number.parseFloat(string);
+        },
+        // Modo Edição
+        editarComprovante() {
+            this.preencherInputs();
+            this.dialog = true;
+        },
+        preencherInputs() {
+            const dados = this.dadosEdicaoComprovante;
+            this.cpfCnpjLabel = dados.CNPJCPF.length > 11 ? 'CNPJ' : 'CPF';
+            this.cpfCnpj = dados.CNPJCPF;
+            // this.nomeRazaoSocial = this.nomeRazaoSocialProps;
+            this.tipoComprovante = parseInt(dados.tipo, 10);
+            this.dataEmissao = dados.dataEmissao.slice(0, 10);
+            this.numero = dados.numero;
+            this.serie = dados.serie;
+            this.nomeArquivo = dados.nmArquivo;
+            this.formaPagamento = parseInt(dados.forma, 10);
+            this.dataPagamento = dados.dataPagamento.slice(0, 10);
+            this.numeroDocumentoPagamento = dados.numeroDocumento;
+            document.getElementById('valor').value = Number.parseFloat(dados.valor).toFixed(2);
+            this.justificativa = dados.justificativa;
         },
         submit() {
             this.buscarFornecedor(this.cpfCnpj);

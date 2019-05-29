@@ -13,12 +13,15 @@
                     <td>{{ props.item.fornecedor.nome }}</td>
                     <td>R$ {{ props.item.valor | moedaMasck }}</td>
                     <td class="text-xs-center">
-                        <v-tooltip top>
+                        <v-tooltip
+                            top
+                        >
                             <v-btn
                                 slot="activator"
                                 flat
                                 icon
                                 color="blue"
+                                @click="editarComprovante(props.item)"
                             >
                                 <v-icon>edit</v-icon>
                             </v-btn>
@@ -72,6 +75,7 @@ export default {
         cidade: { type: String, default: '' },
         etapa: { type: String, default: '' },
         tipo: { type: String, default: '' },
+        valorComprovar: { type: String, default: '' },
     },
     data() {
         return {
@@ -122,7 +126,14 @@ export default {
         ...mapActions({
             listarComprovantes: 'avaliacaoResultados/listarComprovantes',
             excluirComprovante: 'avaliacaoResultados/excluirComprovante',
+            carregarDadosEdicaoComprovante: 'avaliacaoResultados/carregarDadosEdicaoComprovante',
         }),
+        editarComprovante(dadosComprovante) {
+            // 1. Carregar dados do comprovante
+            this.carregarDadosEdicaoComprovante(dadosComprovante);
+            // 2. Emitir evento para iniciar edição
+            this.$root.$emit('editar-comprovante');
+        },
     },
 };
 </script>
