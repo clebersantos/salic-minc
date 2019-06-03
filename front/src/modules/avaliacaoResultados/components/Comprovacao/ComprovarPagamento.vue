@@ -533,7 +533,7 @@ export default {
         dialog(value) {
             // Se a modal for fechada, limpar todos os campos do formulário
             if (!value) {
-                this.reset(this.$refs.form.resetValidation);
+                setTimeout(this.reset, 500, this.$refs.form.resetValidation);
             // Se a modal for aberta em modo de edição, pesquisar agente pelo cpf
             } else if (this.modoEdicao) {
                 this.buscarAgente(this.cpfCnpjParams);

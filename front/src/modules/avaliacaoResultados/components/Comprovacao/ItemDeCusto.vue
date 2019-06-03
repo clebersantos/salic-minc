@@ -11,6 +11,7 @@
             :data-fim="dadosProjeto.dtFimExecucao"
             :valor-comprovar="valorComprovar | moedaFilter"
         />
+        <excluir-comprovante/>
         <v-toolbar>
             <!-- Verificar o caminho de volta -->
             <v-btn
@@ -173,6 +174,7 @@ import { mapActions, mapGetters } from 'vuex';
 import Moeda from '../../../../filters/money';
 import Comprovante from './Comprovante';
 import ComprovarPagamento from './ComprovarPagamento';
+import ExcluirComprovante from './ExcluirComprovante';
 
 Vue.filter('moedaFilter', Moeda);
 
@@ -181,6 +183,7 @@ export default {
     components: {
         Comprovante,
         ComprovarPagamento,
+        ExcluirComprovante,
     },
     filters: {
         dataFilter(data) {
