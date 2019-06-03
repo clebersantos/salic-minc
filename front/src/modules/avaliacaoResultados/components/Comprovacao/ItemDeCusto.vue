@@ -213,8 +213,7 @@ export default {
         ...mapGetters({
             getDadosProjeto: 'avaliacaoResultados/getDadosProjeto',
             getDadosItem: 'avaliacaoResultados/getDadosItem',
-            statusCriarComprovante: 'avaliacaoResultados/statusCriarComprovante',
-            statusExcluirComprovante: 'avaliacaoResultados/statusExcluirComprovante',
+            statusComprovante: 'avaliacaoResultados/statusComprovante',
         }),
         dadosProjeto() {
             return this.getDadosProjeto;
@@ -251,13 +250,8 @@ export default {
         },
     },
     watch: {
-        statusCriarComprovante(status) {
-            this.acao = status.success ? 'criado' : 'criar';
-            this.mensagemFinal = status.success ? this.mensagemSucesso : this.mensagemFalha;
-            this.snackbar = true;
-        },
-        statusExcluirComprovante(status) {
-            this.acao = status.success ? 'excluído' : 'excluir';
+        statusComprovante(status) {
+            this.acao = status.acao;
             this.mensagemFinal = status.success ? this.mensagemSucesso : this.mensagemFalha;
             this.snackbar = true;
         },

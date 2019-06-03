@@ -53,8 +53,7 @@ export const state = {
     dashboard: {},
     projetosSimilares: [],
     agente: [],
-    statusCriarComprovante: {},
-    statusExcluirComprovante: {},
+    statusComprovante: {},
     dadosEdicaoComprovante: {},
 };
 
@@ -270,11 +269,8 @@ export const mutations = {
     [types.BUSCAR_AGENTE](state, dados) {
         state.agente = dados;
     },
-    [types.STATUS_CRIAR_COMPROVANTE](state, dados) {
-        state.statusCriarComprovante = dados;
-    },
-    [types.STATUS_EXCLUIR_COMPROVANTE](state, dados) {
-        state.statusExcluirComprovante = dados;
+    [types.STATUS_COMPROVANTE](state, dados) {
+        state.statusComprovante = dados;
     },
     [types.DADOS_EDICAO_COMPROVANTE](state, dados) {
         state.dadosEdicaoComprovante = dados;

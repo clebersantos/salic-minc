@@ -435,7 +435,8 @@ export const criarComprovante = ({ commit }, params) => {
         .then((response) => {
             // Atualiza o status da requisicao
             const status = response.data;
-            commit(types.STATUS_CRIAR_COMPROVANTE, status);
+            status.acao = status.success ? 'criado' : 'criar';
+            commit(types.STATUS_COMPROVANTE, status);
         }).catch((e) => {
             throw new TypeError(e.response.data.message, 'error', 10);
         });
@@ -445,8 +446,9 @@ export const editarComprovante = ({ commit }, params) => {
     avaliacaoResultadosHelperAPI.editarComprovante(params)
         .then((response) => {
             // Atualiza o status da requisicao
-            //const status = response.data;
-            //commit(types.STATUS_EDITAR_COMPROVANTE, status);
+            const status = response.data;
+            status.acao = status.success ? 'editado' : 'editar';
+            commit(types.STATUS_COMPROVANTE, status);
         }).catch((e) => {
             throw new TypeError(e.response.data.message, 'error', 10);
         });
@@ -457,7 +459,8 @@ export const excluirComprovante = ({ commit }, params) => {
         .then((response) => {
             // Atualiza o status da requisicao
             const status = response.data;
-            commit(types.STATUS_EXCLUIR_COMPROVANTE, status);
+            status.acao = status.success ? 'excluído' : 'excluir';
+            commit(types.STATUS_COMPROVANTE, status);
         }).catch((e) => {
             throw new TypeError(e.response.data.message, 'error', 10);
         });

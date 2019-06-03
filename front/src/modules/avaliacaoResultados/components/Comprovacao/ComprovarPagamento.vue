@@ -459,7 +459,7 @@ export default {
     computed: {
         ...mapGetters({
             agente: 'avaliacaoResultados/buscarAgente',
-            status: 'avaliacaoResultados/statusCriarComprovante',
+            status: 'avaliacaoResultados/statusComprovante',
             dadosEdicaoComprovante: 'avaliacaoResultados/dadosEdicaoComprovante',
         }),
         cpfCnpjMask() {
@@ -529,6 +529,15 @@ export default {
             this.dialog = false;
             setTimeout(this.reset, 2000, this.$refs.form.resetValidation);
             this.$root.$emit('recarregar-comprovantes');
+        },
+        dialog(value) {
+            // Se a modal for fechada, limpar todos os campos do formulário
+            if (!value) {
+                this.reset(this.$refs.form.resetValidation);
+            // Se a modal for aberta em modo de edição, pesquisar agente pelo cpf
+            } else if (this.modoEdicao) {
+                this.buscarAgente(this.cpfCnpjParams);
+            }
         },
     },
     mounted() {
@@ -672,6 +681,7 @@ export default {
             this.valor = 'R$ 0,00';
             this.justificativa = '';
             this.limparAgente();
+            this.modoEdicao = false;
             resetValidation();
         },
     },
