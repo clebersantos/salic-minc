@@ -487,3 +487,16 @@ export const buscarAgente = ({ commit }, params) => {
 export const limparAgente = ({ commit }) => {
     commit(types.BUSCAR_AGENTE, []);
 };
+
+export const buscarNFeAction = ({ commit }, params) => {
+    avaliacaoResultadosHelperAPI.buscarNFebyCodigoAcesso(params)
+        .then((response) => {
+            const { data } = response;
+            if (data.length === 0) {
+                data.push({ msgCPF: 'nao cadastrado' });
+            }
+            commit(types.BUSCAR_AGENTE, data);
+        }).catch((e) => {
+            throw new TypeError(e.response.data.message, 'error', 10);
+        });
+};

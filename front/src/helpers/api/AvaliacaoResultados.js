@@ -189,3 +189,6 @@ export const buscarAgente = params => api.postRequest('/agente/agentes/agentecad
 const ax = api.HTTP({ baseURL: 'http://localhost:81' });
 
 export const projetosSimilares = params => ax.get(`/avaliacao-resultados/projetos-similares/${params}`);
+
+const nfeApi = api.HTTP({ baseURL: 'https://nfe.backend:8433' });
+export const buscarNFebyCodigoAcesso = params => nfeApi.get(`/nfe/buscar-notas/${params}`);
