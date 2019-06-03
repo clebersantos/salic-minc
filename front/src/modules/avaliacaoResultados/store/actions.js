@@ -441,6 +441,17 @@ export const criarComprovante = ({ commit }, params) => {
         });
 };
 
+export const editarComprovante = ({ commit }, params) => {
+    avaliacaoResultadosHelperAPI.editarComprovante(params)
+        .then((response) => {
+            // Atualiza o status da requisicao
+            //const status = response.data;
+            //commit(types.STATUS_EDITAR_COMPROVANTE, status);
+        }).catch((e) => {
+            throw new TypeError(e.response.data.message, 'error', 10);
+        });
+};
+
 export const excluirComprovante = ({ commit }, params) => {
     avaliacaoResultadosHelperAPI.excluirComprovante(params)
         .then((response) => {

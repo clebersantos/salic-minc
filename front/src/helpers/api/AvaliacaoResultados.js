@@ -180,6 +180,19 @@ export const criarComprovante = (params) => {
     return ax.request();
 };
 
+export const editarComprovante = (params) => {
+    const ax = api.HTTP({
+        method: 'post',
+        url: '/prestacao-contas/gerenciar/atualizar',
+        data: params,
+        config: {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        },
+    });
+
+    return ax.request();
+};
+
 export const excluirComprovante = params => api.postRequest('/prestacao-contas/gerenciar/excluir', buildData(params));
 
 export const dashboardQuantidade = () => api.getRequest('/avaliacao-resultados/dashboard');

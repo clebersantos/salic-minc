@@ -387,6 +387,7 @@ export default {
         return {
             dialog: false,
             valid: true,
+            modoEdicao: false,
 
             cpfCnpjLabel: 'CNPJ',
             cpfCnpj: '',
@@ -531,12 +532,13 @@ export default {
         },
     },
     mounted() {
-        this.$root.$on('editar-comprovante', () => this.editarComprovante());
+        this.$root.$on('editar-comprovante', () => this.prepararEdicao());
     },
     methods: {
         ...mapActions({
             buscarAgente: 'avaliacaoResultados/buscarAgente',
             criarComprovante: 'avaliacaoResultados/criarComprovante',
+            editarComprovante: 'avaliacaoResultados/editarComprovante',
             limparAgente: 'avaliacaoResultados/limparAgente',
         }),
         buscarFornecedor(cpfCnpj) {
@@ -577,7 +579,8 @@ export default {
             return Number.parseFloat(string);
         },
         // Modo Edição
-        editarComprovante() {
+        prepararEdicao() {
+            this.modoEdicao = true;
             this.preencherInputs();
             this.dialog = true;
         },
@@ -628,17 +631,27 @@ export default {
                     forma: this.formaPagamento,
                     numeroDocumento: this.numeroDocumentoPagamento,
                     valor: this.valorNumber(this.valor),
-                    valorAntigo: this.valorAtual,
+                    valorAntigo: this.dadosEdicaoComprovante.valor,
                     valorPermitido: this.valorNumber(this.valorComprovar),
                     justificativa: this.justificativa,
                     foiAtualizado: this.foiAtualizado,
                 };
 
+                if (this.modoEdicao) {
+                    comprovante['_index'] = parseInt(this.dadosEdicaoComprovante.idComprovantePagamento, 10);
+                    comprovante.id = parseInt(this.dadosEdicaoComprovante.idComprovantePagamento, 10);
+                    comprovante.idComprovantePagamento = parseInt(this.dadosEdicaoComprovante.idComprovantePagamento, 10);
+                }
+
                 const comprovanteJSON = JSON.stringify(comprovante);
                 formData.append('comprovante', comprovanteJSON);
                 formData.append('arquivo', this.arquivo);
 
-                this.criarComprovante(formData);
+                if (this.modoEdicao) {
+                    this.editarComprovante(formData);
+                } else {
+                    this.criarComprovante(formData);
+                }
             }
         },
         reset(resetValidation) {
