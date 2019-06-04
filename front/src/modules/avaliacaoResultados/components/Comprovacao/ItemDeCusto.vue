@@ -1,7 +1,7 @@
 <template>
     <v-container fluid>
         <!-- Criar Comprovante -->
-        <comprovar-pagamento
+        <criar-comprovante-nacional
             v-if="dadosProjeto.dtInicioExecucao"
             :id-planilha-itens="String(idPlanilhaItens)"
             :id-planilha-aprovacao="String(idPlanilhaAprovacao)"
@@ -29,7 +29,7 @@
                 <h2>Comprovantes Nacionais</h2>
             </v-card-title>
             <v-card-text>
-                <comprovante
+                <lista-comprovantes
                     :id-pronac="String(idPronac)"
                     :id-planilha-itens="String(idPlanilhaItens)"
                     :produto="String(produto)"
@@ -48,7 +48,7 @@
                 <h2>Comprovantes Internacionais</h2>
             </v-card-title>
             <v-card-text>
-                <comprovante
+                <lista-comprovantes
                     :id-pronac="String(idPronac)"
                     :id-planilha-itens="String(idPlanilhaItens)"
                     :produto="String(produto)"
@@ -84,8 +84,8 @@
 import Vue from 'vue';
 import { mapActions, mapGetters } from 'vuex';
 import Moeda from '../../../../filters/money';
-import Comprovante from './Comprovante';
-import ComprovarPagamento from './ComprovarPagamento';
+import ListaComprovantes from './ListaComprovantes';
+import CriarComprovanteNacional from './CriarComprovanteNacional';
 import ExcluirComprovante from './ExcluirComprovante';
 import DetalhesProjeto from './DetalhesProjeto';
 import DetalhesItem from './DetalhesItem';
@@ -95,8 +95,8 @@ Vue.filter('moedaFilter', Moeda);
 export default {
     name: 'ItemDeCusto',
     components: {
-        Comprovante,
-        ComprovarPagamento,
+        ListaComprovantes,
+        CriarComprovanteNacional,
         ExcluirComprovante,
         DetalhesProjeto,
         DetalhesItem,
@@ -131,7 +131,7 @@ export default {
     computed: {
         ...mapGetters({
             dadosProjeto: 'avaliacaoResultados/getDadosProjeto',
-            getDadosItem: 'avaliacaoResultados/getDadosItem',
+            dadosItem: 'avaliacaoResultados/getDadosItem',
             statusComprovante: 'avaliacaoResultados/statusComprovante',
         }),
         dadosItemParams() {
@@ -143,9 +143,6 @@ export default {
                 produto: this.produto,
                 idPlanilhaItens: this.idPlanilhaItens,
             };
-        },
-        dadosItem() {
-            return this.getDadosItem;
         },
         valorComprovar() {
             return this.dadosItem.vlAprovado - this.dadosItem.vlComprovado;
