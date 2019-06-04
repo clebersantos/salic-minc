@@ -19,92 +19,48 @@
             :dados-projeto="dadosProjeto"
         />
 
-        <v-card
-            v-if="dadosItem.Item"
-            class="mt-3"
-        >
+        <detalhes-item
+            :dados-item="dadosItem"
+            :valor-comprovar="valorComprovar"
+        />
+
+        <v-card class="mt-3">
             <v-card-title primary-title>
-                <h2>Item: {{ dadosItem.Item }}</h2>
+                <h2>Comprovantes Nacionais</h2>
             </v-card-title>
             <v-card-text>
-                <div class="my-3">
-                    <div class="d-inline-block mr-5">
-                        <h4>Produto</h4>
-                        <p
-                            class="text-xs-left"
-                            v-html="dadosItem.Produto"/>
-                    </div>
-                    <div class="d-inline-block mr-5">
-                        <h4>Etapa</h4>
-                        <p class="text-xs-left">{{ dadosItem.Etapa }}</p>
-                    </div>
-                    <div class="d-inline-block mr-5">
-                        <h4>UF</h4>
-                        <p class="text-xs-left">{{ dadosItem.uf }}</p>
-                    </div>
-                    <div class="d-inline-block mr-5">
-                        <h4>Cidade</h4>
-                        <p class="text-xs-left">{{ dadosItem.cidade }}</p>
-                    </div>
-                    <div class="d-inline-block mr-5">
-                        <h4>Itens de Custo</h4>
-                        <p class="text-xs-left">{{ dadosItem.Item }}</p>
-                    </div>
-                    <div class="d-inline-block mr-5">
-                        <h4>Aprovado</h4>
-                        <p class="text-xs-left">R$ {{ dadosItem.vlAprovado | moedaFilter }}</p>
-                    </div>
-                    <div class="d-inline-block mr-5">
-                        <h4>Total Comprovado</h4>
-                        <p class="text-xs-left">R$ {{ dadosItem.vlComprovado | moedaFilter }}</p>
-                    </div>
-                    <div class="d-inline-block">
-                        <h4>Faltando Comprovar</h4>
-                        <p class="text-xs-left">R$ {{ valorComprovar | moedaFilter }}</p>
-                    </div>
-                </div>
+                <comprovante
+                    :id-pronac="String(idPronac)"
+                    :id-planilha-itens="String(idPlanilhaItens)"
+                    :produto="String(produto)"
+                    :uf="String(uf)"
+                    :id-uf="String(idUf)"
+                    :cidade="String(cidade)"
+                    :etapa="String(etapa)"
+                    :valor-comprovar="valorComprovar | moedaFilter"
+                    tipo="nacional"
+                />
             </v-card-text>
         </v-card>
 
-        <v-container fluid>
-            <v-card class="mt-3">
-                <v-card-title primary-title>
-                    <h2>Comprovantes Nacionais</h2>
-                </v-card-title>
-                <v-card-text>
-                    <comprovante
-                        :id-pronac="String(idPronac)"
-                        :id-planilha-itens="String(idPlanilhaItens)"
-                        :produto="String(produto)"
-                        :uf="String(uf)"
-                        :id-uf="String(idUf)"
-                        :cidade="String(cidade)"
-                        :etapa="String(etapa)"
-                        :valor-comprovar="valorComprovar | moedaFilter"
-                        tipo="nacional"
-                    />
-                </v-card-text>
-            </v-card>
-
-            <v-card class="mt-3">
-                <v-card-title primary-title>
-                    <h2>Comprovantes Internacionais</h2>
-                </v-card-title>
-                <v-card-text>
-                    <comprovante
-                        :id-pronac="String(idPronac)"
-                        :id-planilha-itens="String(idPlanilhaItens)"
-                        :produto="String(produto)"
-                        :uf="String(uf)"
-                        :id-uf="String(idUf)"
-                        :cidade="String(cidade)"
-                        :etapa="String(etapa)"
-                        :valor-comprovar="valorComprovar | moedaFilter"
-                        tipo="internacional"
-                    />
-                </v-card-text>
-            </v-card>
-        </v-container>
+        <v-card class="mt-3">
+            <v-card-title primary-title>
+                <h2>Comprovantes Internacionais</h2>
+            </v-card-title>
+            <v-card-text>
+                <comprovante
+                    :id-pronac="String(idPronac)"
+                    :id-planilha-itens="String(idPlanilhaItens)"
+                    :produto="String(produto)"
+                    :uf="String(uf)"
+                    :id-uf="String(idUf)"
+                    :cidade="String(cidade)"
+                    :etapa="String(etapa)"
+                    :valor-comprovar="valorComprovar | moedaFilter"
+                    tipo="internacional"
+                />
+            </v-card-text>
+        </v-card>
 
         <!-- Mensagem mostrada ao criar, editar ou excluir um comprovante -->
         <v-snackbar
@@ -132,6 +88,7 @@ import Comprovante from './Comprovante';
 import ComprovarPagamento from './ComprovarPagamento';
 import ExcluirComprovante from './ExcluirComprovante';
 import DetalhesProjeto from './DetalhesProjeto';
+import DetalhesItem from './DetalhesItem';
 
 Vue.filter('moedaFilter', Moeda);
 
@@ -142,6 +99,7 @@ export default {
         ComprovarPagamento,
         ExcluirComprovante,
         DetalhesProjeto,
+        DetalhesItem,
     },
     filters: {
         dataFilter(data) {

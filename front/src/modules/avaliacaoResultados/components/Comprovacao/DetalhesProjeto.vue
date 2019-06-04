@@ -1,5 +1,5 @@
 <template>
-    <v-container fluid>
+    <div>
         <v-toolbar>
             <v-btn
                 :to="{ name: 'PlanilhaComprovacao', params: { id: idPronac }}"
@@ -51,7 +51,7 @@
                 >VER PROJETO</v-btn>
             </v-card-actions>
         </v-card>
-    </v-container>
+    </div>
 </template>
 
 <script>
