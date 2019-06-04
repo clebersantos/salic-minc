@@ -1,7 +1,7 @@
 <template>
     <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
         <template v-slot:activator="{ on }">
-            <v-btn color="primary" dark v-on="on">Open Dialog</v-btn>
+            <v-btn color="primary" dark v-on="on">NFe</v-btn>
         </template>
         <v-card>
             <v-toolbar dark color="primary">
@@ -14,24 +14,40 @@
                 <v-subheader>
                     Item:
                 </v-subheader>
-                <v-flex xs12 sm6 md3>
+                <v-flex xs12 sm12 md12>
                     <v-text-field
                         label="Código de Acesso"
                         placeholder="0000 0000 0000 0000 0000 0000 0000 000 0000 0000 0000"
                         outline
+                        v-model="chaveAcesso"
                     ></v-text-field>
-                    <v-btn dark>
+                    <v-btn
+                        @click="buscarNFe()"
+                        dark
+                    >
                         Buscar
                     </v-btn>
                 </v-flex>
-                <v-flex xs12 sm6 d-flex>
+                <v-flex
+                    v-if="produtos"
+                    xs12
+                    sm6
+                    d-flex
+                >
                     <v-select
-                        :items="items"
-                        label="Outline style"
+                        :items="[produtos]"
+                        item-text="xProd"
+                        item-value="cProd"
+                        label="Produto"
                         outline
                         ></v-select>
                 </v-flex>
-                <v-btn dark  @click="dialog = false">Salvar</v-btn>
+                <v-btn 
+                    v-if="produtos"
+                    dark  
+                    @click="dialog = false">
+                    Salvar
+                </v-btn>
             </v-container>
         </v-card>
     </v-dialog>
@@ -39,7 +55,7 @@
 
 <script>
 import Vue from 'vue';
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import Moeda from '../../../../filters/money';
 import ComprovarPagamento from './ComprovarPagamento';
 import ExcluirComprovante from './ExcluirComprovante';
@@ -64,17 +80,18 @@ export default {
         },
     },
     props: {
-        idPronac: { type: String, default: '' },
-        idPlanilhaItens: { type: String, default: '' },
-        produto: { type: String, default: '' },
+        idPronac: { type:[String, Number] , default: '' },
+        idPlanilhaItens: { type: [String, Number], default: '' },
+        produto: { type: [String, Number], default: '' },
         uf: { type: String, default: '' },
-        idUf: { type: String, default: '' },
-        cidade: { type: String, default: '' },
-        etapa: { type: String, default: '' },
+        idUf: { type: [String, Number], default: '' },
+        cidade: { type: [String, Number], default: '' },
+        etapa: { type: [String, Number], default: '' },
         tipo: { type: String, default: '' },
     },
     data() {
         return {
+            chaveAcesso: '',
             comprovanteParams: {
                 idPronac: this.idPronac,
                 idPlanilhaItens: this.idPlanilhaItens,
@@ -110,9 +127,18 @@ export default {
         };
     },
     computed: {
+        ...mapGetters({
+            getNFe: 'avaliacaoResultados/getNFe',
+        }),
         comprovantes() {
             return this.$store.getters[this.getter];
         },
+        produtos() {
+            return Object.keys(this.getNFe).length > 0 ? this.getNFe.data.NFe.infNFe.det.prod : false;
+        },
+    },
+    created() {
+        this.buscarNFeAction();
     },
     mounted() {
         this.listarComprovantes(this.comprovanteParams);
@@ -122,7 +148,11 @@ export default {
         ...mapActions({
             listarComprovantes: 'avaliacaoResultados/listarComprovantes',
             excluirComprovante: 'avaliacaoResultados/excluirComprovante',
+            buscarNFeAction: 'avaliacaoResultados/buscarNFeAction',
         }),
+        buscarNFe() {
+            this.buscarNFeAction(this.chaveAcesso);
+        },
     },
 };
 </script>

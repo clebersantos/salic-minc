@@ -495,7 +495,7 @@ export const buscarNFeAction = ({ commit }, params) => {
             if (data.length === 0) {
                 data.push({ msgCPF: 'nao cadastrado' });
             }
-            commit(types.BUSCAR_AGENTE, data);
+            commit(types.SET_NFE, data[0]);
         }).catch((e) => {
             throw new TypeError(e.response.data.message, 'error', 10);
         });
