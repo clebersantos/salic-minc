@@ -49,6 +49,7 @@
                             wrap
                         >
                             <v-flex
+                                v-if="!modoVisualizacao"
                                 xs12
                             >
                                 <v-radio-group
@@ -77,6 +78,7 @@
                                     v-model="cpfCnpj"
                                     :mask="cpfCnpjMask"
                                     :placeholder="cpfCnpjPlaceholder"
+                                    :readonly="modoVisualizacao"
                                     return-masked-value
                                     validate-on-blur
                                     outline
@@ -124,6 +126,7 @@
                             >
                                 <v-select
                                     :items="tipoComprovanteOpcoes"
+                                    :readonly="modoVisualizacao"
                                     v-model="tipoComprovante"
                                     item-value="value"
                                     item-text="text"
@@ -141,6 +144,7 @@
                                     v-model="dataEmissaoPicker"
                                     :close-on-content-click="false"
                                     :nudge-right="40"
+                                    :disabled="modoVisualizacao"
                                     lazy
                                     transition="scale-transition"
                                     offset-y
@@ -177,6 +181,7 @@
                             >
                                 <v-text-field
                                     :rules="numeroRules"
+                                    :readonly="modoVisualizacao"
                                     v-model="numero"
                                     label="NÚMERO *"
                                     placeholder="00000000"
@@ -189,6 +194,7 @@
                                 md3
                             >
                                 <v-text-field
+                                    :readonly="modoVisualizacao"
                                     v-model="serie"
                                     label="SÉRIE"
                                     placeholder="00000000000"
@@ -199,6 +205,7 @@
                                 xs12
                             >
                                 <v-btn
+                                    v-if="!modoVisualizacao"
                                     class="d-inline-block"
                                     dark
                                     color="teal"
@@ -238,6 +245,7 @@
                             >
                                 <v-select
                                     :items="formaPagamentoOpcoes"
+                                    :readonly="modoVisualizacao"
                                     v-model="formaPagamento"
                                     item-value="value"
                                     item-text="text"
@@ -255,6 +263,7 @@
                                     v-model="dataPagamentoPicker"
                                     :close-on-content-click="false"
                                     :nudge-right="40"
+                                    :disabled="modoVisualizacao"
                                     lazy
                                     transition="scale-transition"
                                     offset-y
@@ -289,6 +298,7 @@
                             >
                                 <v-text-field
                                     :rules="numeroRules"
+                                    :readonly="modoVisualizacao"
                                     v-model="numeroDocumentoPagamento"
                                     label="Nº DOCUMENTO PAGAMENTO *"
                                     placeholder="00000000000"
@@ -306,6 +316,7 @@
                                     id="valor"
                                     :hint="`*Máximo: R$ ${valorComprovar}`"
                                     :rules="valorRules"
+                                    :readonly="modoVisualizacao"
                                     v-model.lazy="valor"
                                     label="VALOR *"
                                     persistent-hint
@@ -322,6 +333,7 @@
                                 xs12
                             >
                                 <v-textarea
+                                    :readonly="modoVisualizacao"
                                     v-model="justificativa"
                                     value=""
                                     placeholder="Digite aqui a justificativa."
@@ -333,7 +345,7 @@
                     </v-container>
                 </v-form>
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions v-if="!modoVisualizacao">
                 <v-spacer/>
                 <span
                     v-if="!valid"
@@ -388,6 +400,7 @@ export default {
             dialog: false,
             valid: true,
             modoEdicao: false,
+            modoVisualizacao: false,
 
             cpfCnpjLabel: 'CNPJ',
             cpfCnpj: '',
@@ -542,6 +555,7 @@ export default {
     },
     mounted() {
         this.$root.$on('editar-comprovante', () => this.prepararEdicao());
+        this.$root.$on('visualizar-comprovante', () => this.prepararVisualizacao());
     },
     methods: {
         ...mapActions({
@@ -591,6 +605,12 @@ export default {
         prepararEdicao() {
             this.modoEdicao = true;
             this.preencherInputs();
+            this.dialog = true;
+        },
+        // Modo Visualização
+        prepararVisualizacao() {
+            this.preencherInputs();
+            this.modoVisualizacao = true;
             this.dialog = true;
         },
         preencherInputs() {
@@ -682,6 +702,7 @@ export default {
             this.justificativa = '';
             this.limparAgente();
             this.modoEdicao = false;
+            this.modoVisualizacao = false;
             resetValidation();
         },
     },

@@ -13,6 +13,22 @@
                     <td>{{ props.item.fornecedor.nome }}</td>
                     <td>R$ {{ props.item.valor | moedaMasck }}</td>
                     <td class="text-xs-center">
+                        <!-- Visualizar Comprovante -->
+                        <v-tooltip
+                            top
+                        >
+                            <v-btn
+                                slot="activator"
+                                flat
+                                icon
+                                color="green"
+                                @click="visualizarComprovante(props.item)"
+                            >
+                                <v-icon>visibility</v-icon>
+                            </v-btn>
+                            <span>Visualizar</span>
+                        </v-tooltip>
+
                         <!-- Editar Comprovante -->
                         <v-tooltip
                             top
@@ -28,6 +44,7 @@
                             </v-btn>
                             <span>Editar</span>
                         </v-tooltip>
+
                         <!-- Excluir Comprovante -->
                         <v-tooltip
                             top
@@ -135,6 +152,12 @@ export default {
             excluirComprovante: 'avaliacaoResultados/excluirComprovante',
             carregarDadosEdicaoComprovante: 'avaliacaoResultados/carregarDadosEdicaoComprovante',
         }),
+        visualizarComprovante(dadosComprovante) {
+            // 1. Carregar dados do comprovante
+            this.carregarDadosEdicaoComprovante(dadosComprovante);
+            // 2. Emitir evento para iniciar visualização
+            this.$root.$emit('visualizar-comprovante');
+        },
         editarComprovante(dadosComprovante) {
             // 1. Carregar dados do comprovante
             this.carregarDadosEdicaoComprovante(dadosComprovante);
