@@ -3,20 +3,6 @@
         v-model="dialog"
         width="500"
     >
-        <v-tooltip
-            slot="activator"
-            top
-        >
-            <v-btn
-                slot="activator"
-                flat
-                icon
-                color="red"
-            >
-                <v-icon>delete</v-icon>
-            </v-btn>
-            <span>Excluir</span>
-        </v-tooltip>
         <v-card>
             <v-card-text>
                 Você tem certeza que deseja excluir este comprovante?
@@ -27,7 +13,7 @@
                 <v-btn
                     color="success"
                     flat
-                    @click="confirmarExclusao(idComprovantePagamento)"
+                    @click="excluir"
                 >
                     SIM
                 </v-btn>
@@ -53,16 +39,28 @@ export default {
     data() {
         return {
             dialog: false,
+            idComprovante: '',
         };
+    },
+    watch: {
+        status() {
+            this.$root.$emit('recarregar-comprovantes');
+        },
+    },
+    mounted() {
+        this.$root.$on('excluir-comprovante', this.verificarExclusao);
     },
     methods: {
         ...mapActions({
             excluirComprovante: 'avaliacaoResultados/excluirComprovante',
         }),
-        confirmarExclusao(idComprovantePagamento) {
-            this.excluirComprovante({ 'comprovante[idComprovantePagamento]': idComprovantePagamento });
-            this.$root.$emit('recarregar-comprovantes');
+        excluir() {
+            this.excluirComprovante({ 'comprovante[idComprovantePagamento]': this.idComprovante });
             this.dialog = false;
+        },
+        verificarExclusao(idComprovantePagamento) {
+            this.dialog = true;
+            this.idComprovante = idComprovantePagamento;
         },
     },
 };

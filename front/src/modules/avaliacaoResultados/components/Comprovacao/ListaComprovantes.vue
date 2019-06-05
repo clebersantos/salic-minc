@@ -13,20 +13,53 @@
                     <td>{{ props.item.fornecedor.nome }}</td>
                     <td>R$ {{ props.item.valor | moedaMasck }}</td>
                     <td class="text-xs-center">
-                        <v-tooltip top>
+                        <!-- Visualizar Comprovante -->
+                        <v-tooltip
+                            top
+                        >
+                            <v-btn
+                                slot="activator"
+                                flat
+                                icon
+                                color="green"
+                                @click="visualizarComprovante(props.item)"
+                            >
+                                <v-icon>visibility</v-icon>
+                            </v-btn>
+                            <span>Visualizar</span>
+                        </v-tooltip>
+
+                        <!-- Editar Comprovante -->
+                        <v-tooltip
+                            top
+                        >
                             <v-btn
                                 slot="activator"
                                 flat
                                 icon
                                 color="blue"
+                                @click="editarComprovante(props.item)"
                             >
                                 <v-icon>edit</v-icon>
                             </v-btn>
                             <span>Editar</span>
                         </v-tooltip>
-                        <ExcluirComprovante
-                            :id-comprovante-pagamento="props.item.idComprovantePagamento"
-                        />
+
+                        <!-- Excluir Comprovante -->
+                        <v-tooltip
+                            top
+                        >
+                            <v-btn
+                                slot="activator"
+                                flat
+                                icon
+                                color="red"
+                                @click="excluirComprovante(props.item.idComprovantePagamento)"
+                            >
+                                <v-icon>delete</v-icon>
+                            </v-btn>
+                            <span>Excluir</span>
+                        </v-tooltip>
                     </td>
                 </template>
             </v-data-table>
@@ -41,17 +74,11 @@
 import Vue from 'vue';
 import { mapActions } from 'vuex';
 import Moeda from '../../../../filters/money';
-import ComprovarPagamento from './ComprovarPagamento';
-import ExcluirComprovante from './ExcluirComprovante';
 
 Vue.filter('moedaMasck', Moeda);
 
 export default {
     name: 'Comprovante',
-    components: {
-        ComprovarPagamento,
-        ExcluirComprovante,
-    },
     filters: {
         dataMasck(data) {
             const dataFormatada = data.replace(/-/g, '/');
@@ -72,6 +99,7 @@ export default {
         cidade: { type: String, default: '' },
         etapa: { type: String, default: '' },
         tipo: { type: String, default: '' },
+        valorComprovar: { type: String, default: '' },
     },
     data() {
         return {
@@ -122,7 +150,23 @@ export default {
         ...mapActions({
             listarComprovantes: 'avaliacaoResultados/listarComprovantes',
             excluirComprovante: 'avaliacaoResultados/excluirComprovante',
+            carregarDadosEdicaoComprovante: 'avaliacaoResultados/carregarDadosEdicaoComprovante',
         }),
+        visualizarComprovante(dadosComprovante) {
+            // 1. Carregar dados do comprovante
+            this.carregarDadosEdicaoComprovante(dadosComprovante);
+            // 2. Emitir evento para iniciar visualização
+            this.$root.$emit('visualizar-comprovante');
+        },
+        editarComprovante(dadosComprovante) {
+            // 1. Carregar dados do comprovante
+            this.carregarDadosEdicaoComprovante(dadosComprovante);
+            // 2. Emitir evento para iniciar edição
+            this.$root.$emit('editar-comprovante');
+        },
+        excluirComprovante(idComprovantePagamento) {
+            this.$root.$emit('excluir-comprovante', idComprovantePagamento);
+        },
     },
 };
 </script>

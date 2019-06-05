@@ -3,18 +3,24 @@
         v-model="dialog"
         scrollable
     >
-        <v-btn
+        <v-tooltip
             slot="activator"
-            color="teal"
-            dark
-            fixed
-            bottom
-            right
-            fab
-            @click="valid = true"
+            left
         >
-            <v-icon>add</v-icon>
-        </v-btn>
+            <v-btn
+                slot="activator"
+                color="teal"
+                dark
+                fixed
+                bottom
+                right
+                fab
+                @click="valid = true"
+            >
+                <v-icon>add</v-icon>
+            </v-btn>
+            <span>Criar Comprovante</span>
+        </v-tooltip>
         <v-card>
             <v-toolbar
                 dark
@@ -43,6 +49,7 @@
                             wrap
                         >
                             <v-flex
+                                v-if="!modoVisualizacao"
                                 xs12
                             >
                                 <v-radio-group
@@ -71,6 +78,7 @@
                                     v-model="cpfCnpj"
                                     :mask="cpfCnpjMask"
                                     :placeholder="cpfCnpjPlaceholder"
+                                    :readonly="modoVisualizacao"
                                     return-masked-value
                                     validate-on-blur
                                     outline
@@ -118,6 +126,7 @@
                             >
                                 <v-select
                                     :items="tipoComprovanteOpcoes"
+                                    :readonly="modoVisualizacao"
                                     v-model="tipoComprovante"
                                     item-value="value"
                                     item-text="text"
@@ -135,6 +144,7 @@
                                     v-model="dataEmissaoPicker"
                                     :close-on-content-click="false"
                                     :nudge-right="40"
+                                    :disabled="modoVisualizacao"
                                     lazy
                                     transition="scale-transition"
                                     offset-y
@@ -171,6 +181,7 @@
                             >
                                 <v-text-field
                                     :rules="numeroRules"
+                                    :readonly="modoVisualizacao"
                                     v-model="numero"
                                     label="NÚMERO *"
                                     placeholder="00000000"
@@ -183,6 +194,7 @@
                                 md3
                             >
                                 <v-text-field
+                                    :readonly="modoVisualizacao"
                                     v-model="serie"
                                     label="SÉRIE"
                                     placeholder="00000000000"
@@ -193,6 +205,7 @@
                                 xs12
                             >
                                 <v-btn
+                                    v-if="!modoVisualizacao"
                                     class="d-inline-block"
                                     dark
                                     color="teal"
@@ -232,6 +245,7 @@
                             >
                                 <v-select
                                     :items="formaPagamentoOpcoes"
+                                    :readonly="modoVisualizacao"
                                     v-model="formaPagamento"
                                     item-value="value"
                                     item-text="text"
@@ -249,6 +263,7 @@
                                     v-model="dataPagamentoPicker"
                                     :close-on-content-click="false"
                                     :nudge-right="40"
+                                    :disabled="modoVisualizacao"
                                     lazy
                                     transition="scale-transition"
                                     offset-y
@@ -283,6 +298,7 @@
                             >
                                 <v-text-field
                                     :rules="numeroRules"
+                                    :readonly="modoVisualizacao"
                                     v-model="numeroDocumentoPagamento"
                                     label="Nº DOCUMENTO PAGAMENTO *"
                                     placeholder="00000000000"
@@ -298,8 +314,9 @@
                                 <v-text-field
                                     v-money="money"
                                     id="valor"
-                                    :hint="`*Atual: R$ ${valorAtual} / Máx: R$ ${valorComprovar}`"
+                                    :hint="`*Máximo: R$ ${valorComprovar}`"
                                     :rules="valorRules"
+                                    :readonly="modoVisualizacao"
                                     v-model.lazy="valor"
                                     label="VALOR *"
                                     persistent-hint
@@ -316,6 +333,7 @@
                                 xs12
                             >
                                 <v-textarea
+                                    :readonly="modoVisualizacao"
                                     v-model="justificativa"
                                     value=""
                                     placeholder="Digite aqui a justificativa."
@@ -327,7 +345,7 @@
                     </v-container>
                 </v-form>
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions v-if="!modoVisualizacao">
                 <v-spacer/>
                 <span
                     v-if="!valid"
@@ -376,12 +394,13 @@ export default {
         dataInicio: { type: String, default: '' },
         dataFim: { type: String, default: '' },
         valorComprovar: { type: String, default: '0' },
-        valorAtual: { type: String, default: (0).toFixed(2) },
     },
     data() {
         return {
             dialog: false,
             valid: true,
+            modoEdicao: false,
+            modoVisualizacao: false,
 
             cpfCnpjLabel: 'CNPJ',
             cpfCnpj: '',
@@ -453,7 +472,8 @@ export default {
     computed: {
         ...mapGetters({
             agente: 'avaliacaoResultados/buscarAgente',
-            status: 'avaliacaoResultados/statusCriarComprovante',
+            status: 'avaliacaoResultados/statusComprovante',
+            dadosEdicaoComprovante: 'avaliacaoResultados/dadosEdicaoComprovante',
         }),
         cpfCnpjMask() {
             return this.cpfCnpjLabel === 'CNPJ' ? this.cnpjMask : this.cpfMask;
@@ -523,11 +543,25 @@ export default {
             setTimeout(this.reset, 2000, this.$refs.form.resetValidation);
             this.$root.$emit('recarregar-comprovantes');
         },
+        dialog(value) {
+            // Se a modal for fechada, limpar todos os campos do formulário
+            if (!value) {
+                setTimeout(this.reset, 500, this.$refs.form.resetValidation);
+            // Se a modal for aberta em modo de edição, pesquisar agente pelo cpf
+            } else if (this.modoEdicao) {
+                this.buscarAgente(this.cpfCnpjParams);
+            }
+        },
+    },
+    mounted() {
+        this.$root.$on('editar-comprovante', () => this.prepararEdicao());
+        this.$root.$on('visualizar-comprovante', () => this.prepararVisualizacao());
     },
     methods: {
         ...mapActions({
             buscarAgente: 'avaliacaoResultados/buscarAgente',
             criarComprovante: 'avaliacaoResultados/criarComprovante',
+            editarComprovante: 'avaliacaoResultados/editarComprovante',
             limparAgente: 'avaliacaoResultados/limparAgente',
         }),
         buscarFornecedor(cpfCnpj) {
@@ -565,7 +599,35 @@ export default {
             let string = number.replace(/R\$ /g, ''); // Retira prefixo R$
             string = string.replace(/\./g, ''); // Retira pontos
             string = string.replace(/,/g, '.'); // Transforma vírgulas em pontos
-            return parseFloat(string);
+            return Number.parseFloat(string);
+        },
+        // Modo Edição
+        prepararEdicao() {
+            this.modoEdicao = true;
+            this.preencherInputs();
+            this.dialog = true;
+        },
+        // Modo Visualização
+        prepararVisualizacao() {
+            this.preencherInputs();
+            this.modoVisualizacao = true;
+            this.dialog = true;
+        },
+        preencherInputs() {
+            const dados = this.dadosEdicaoComprovante;
+            this.cpfCnpjLabel = dados.CNPJCPF.length > 11 ? 'CNPJ' : 'CPF';
+            this.cpfCnpj = dados.CNPJCPF;
+            // this.nomeRazaoSocial = this.nomeRazaoSocialProps;
+            this.tipoComprovante = parseInt(dados.tipo, 10);
+            this.dataEmissao = dados.dataEmissao.slice(0, 10);
+            this.numero = dados.numero;
+            this.serie = dados.serie;
+            this.nomeArquivo = dados.nmArquivo;
+            this.formaPagamento = parseInt(dados.forma, 10);
+            this.dataPagamento = dados.dataPagamento.slice(0, 10);
+            this.numeroDocumentoPagamento = dados.numeroDocumento;
+            document.getElementById('valor').value = Number.parseFloat(dados.valor).toFixed(2);
+            this.justificativa = dados.justificativa;
         },
         submit() {
             this.buscarFornecedor(this.cpfCnpj);
@@ -598,17 +660,27 @@ export default {
                     forma: this.formaPagamento,
                     numeroDocumento: this.numeroDocumentoPagamento,
                     valor: this.valorNumber(this.valor),
-                    valorAntigo: this.valorAtual,
+                    valorAntigo: this.dadosEdicaoComprovante.valor,
                     valorPermitido: this.valorNumber(this.valorComprovar),
                     justificativa: this.justificativa,
                     foiAtualizado: this.foiAtualizado,
                 };
 
+                if (this.modoEdicao) {
+                    comprovante['_index'] = parseInt(this.dadosEdicaoComprovante.idComprovantePagamento, 10);
+                    comprovante.id = parseInt(this.dadosEdicaoComprovante.idComprovantePagamento, 10);
+                    comprovante.idComprovantePagamento = parseInt(this.dadosEdicaoComprovante.idComprovantePagamento, 10);
+                }
+
                 const comprovanteJSON = JSON.stringify(comprovante);
                 formData.append('comprovante', comprovanteJSON);
                 formData.append('arquivo', this.arquivo);
 
-                this.criarComprovante(formData);
+                if (this.modoEdicao) {
+                    this.editarComprovante(formData);
+                } else {
+                    this.criarComprovante(formData);
+                }
             }
         },
         reset(resetValidation) {
@@ -629,6 +701,8 @@ export default {
             this.valor = 'R$ 0,00';
             this.justificativa = '';
             this.limparAgente();
+            this.modoEdicao = false;
+            this.modoVisualizacao = false;
             resetValidation();
         },
     },

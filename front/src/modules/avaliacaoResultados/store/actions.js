@@ -435,20 +435,39 @@ export const criarComprovante = ({ commit }, params) => {
         .then((response) => {
             // Atualiza o status da requisicao
             const status = response.data;
-            commit(types.STATUS_CRIAR_COMPROVANTE, status);
-            // INSERIR NOVO COMPROVANTE NO STATE DA LISTA DE COMPROVANTES
+            status.acao = status.success ? 'criado' : 'criar';
+            commit(types.STATUS_COMPROVANTE, status);
         }).catch((e) => {
             throw new TypeError(e.response.data.message, 'error', 10);
         });
 };
 
-export const excluirComprovante = (_, params) => {
-    avaliacaoResultadosHelperAPI.excluirComprovante(params)
+export const editarComprovante = ({ commit }, params) => {
+    avaliacaoResultadosHelperAPI.editarComprovante(params)
         .then((response) => {
-            const { data } = response;
+            // Atualiza o status da requisicao
+            const status = response.data;
+            status.acao = status.success ? 'editado' : 'editar';
+            commit(types.STATUS_COMPROVANTE, status);
         }).catch((e) => {
             throw new TypeError(e.response.data.message, 'error', 10);
         });
+};
+
+export const excluirComprovante = ({ commit }, params) => {
+    avaliacaoResultadosHelperAPI.excluirComprovante(params)
+        .then((response) => {
+            // Atualiza o status da requisicao
+            const status = response.data;
+            status.acao = status.success ? 'excluído' : 'excluir';
+            commit(types.STATUS_COMPROVANTE, status);
+        }).catch((e) => {
+            throw new TypeError(e.response.data.message, 'error', 10);
+        });
+};
+
+export const carregarDadosEdicaoComprovante = ({ commit }, params) => {
+    commit(types.DADOS_EDICAO_COMPROVANTE, params);
 };
 
 export const dashboardQuantidades = ({ commit }) => {
