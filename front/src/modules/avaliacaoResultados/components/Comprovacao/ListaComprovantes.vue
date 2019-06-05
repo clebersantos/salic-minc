@@ -150,17 +150,17 @@ export default {
         ...mapActions({
             listarComprovantes: 'avaliacaoResultados/listarComprovantes',
             excluirComprovante: 'avaliacaoResultados/excluirComprovante',
-            carregarDadosEdicaoComprovante: 'avaliacaoResultados/carregarDadosEdicaoComprovante',
+            carregarDadosComprovante: 'avaliacaoResultados/carregarDadosComprovante',
         }),
         visualizarComprovante(dadosComprovante) {
             // 1. Carregar dados do comprovante
-            this.carregarDadosEdicaoComprovante(dadosComprovante);
+            this.carregarDadosComprovante(dadosComprovante);
             // 2. Emitir evento para iniciar visualização
             this.$root.$emit('visualizar-comprovante');
         },
         editarComprovante(dadosComprovante) {
             // 1. Carregar dados do comprovante
-            this.carregarDadosEdicaoComprovante(dadosComprovante);
+            this.carregarDadosComprovante(dadosComprovante);
             // 2. Emitir evento para iniciar edição
             this.$root.$emit('editar-comprovante');
         },

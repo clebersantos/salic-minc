@@ -42,4 +42,4 @@ export const getDashboardQuantidade = state => state.dashboard;
 export const getProjetosSimilares = state => state.projetosSimilares;
 export const buscarAgente = state => state.agente;
 export const statusComprovante = state => state.statusComprovante;
-export const dadosEdicaoComprovante = state => state.dadosEdicaoComprovante;
+export const dadosComprovante = state => state.dadosComprovante;

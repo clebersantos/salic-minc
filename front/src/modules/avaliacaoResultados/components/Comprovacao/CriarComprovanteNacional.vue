@@ -33,7 +33,9 @@
                 >
                     <v-icon>close</v-icon>
                 </v-btn>
-                <v-toolbar-title>Criar Comprovante</v-toolbar-title>
+                <v-toolbar-title v-if="modoEdicao">Editar Comprovante</v-toolbar-title>
+                <v-toolbar-title v-else-if="modoVisualizacao">Visualizar Comprovante</v-toolbar-title>
+                <v-toolbar-title v-else>Criar Comprovante</v-toolbar-title>
                 <v-spacer/>
             </v-toolbar>
             <v-card-text>
@@ -79,10 +81,10 @@
                                     :mask="cpfCnpjMask"
                                     :placeholder="cpfCnpjPlaceholder"
                                     :readonly="modoVisualizacao"
+                                    :append-icon="modoVisualizacao ? undefined : 'search'"
                                     return-masked-value
                                     validate-on-blur
                                     outline
-                                    append-icon="search"
                                     @click:append="buscarFornecedor(cpfCnpj)"
                                     @keyup.enter="buscarFornecedor(cpfCnpj)"
                                     @blur="buscarFornecedor(cpfCnpj)"
@@ -206,7 +208,7 @@
                             >
                                 <v-btn
                                     v-if="!modoVisualizacao"
-                                    class="d-inline-block"
+                                    class="ml-0 d-inline-block"
                                     dark
                                     color="teal"
                                     @click="pickFile"
@@ -214,6 +216,7 @@
                                     COMPROVANTE *<v-icon right>attachment</v-icon>
                                 </v-btn>
                                 <v-text-field
+                                    v-if="!modoVisualizacao"
                                     v-model="nomeArquivo"
                                     :rules="arquivoRules"
                                     :placeholder="nomeArquivo"
@@ -224,6 +227,21 @@
                                     flat
                                     @click="pickFile"
                                 />
+                                <span
+                                    v-if="modoVisualizacao"
+                                    class="caption primary--text d-block"
+                                >
+                                    ARQUIVO
+                                </span>
+                                <v-btn
+                                    v-if="modoVisualizacao"
+                                    :href="`/upload/abrir/id/${dadosComprovante.idArquivo}`"
+                                    class="ml-0"
+                                    dark
+                                    color="teal"
+                                >
+                                    {{ dadosComprovante.nmArquivo }}<v-icon right>get_app</v-icon>
+                                </v-btn>
                                 <input
                                     ref="inputComprovante"
                                     type="file"
@@ -473,7 +491,7 @@ export default {
         ...mapGetters({
             agente: 'avaliacaoResultados/buscarAgente',
             status: 'avaliacaoResultados/statusComprovante',
-            dadosEdicaoComprovante: 'avaliacaoResultados/dadosEdicaoComprovante',
+            dadosComprovante: 'avaliacaoResultados/dadosComprovante',
         }),
         cpfCnpjMask() {
             return this.cpfCnpjLabel === 'CNPJ' ? this.cnpjMask : this.cpfMask;
@@ -488,6 +506,9 @@ export default {
             return this.cpfCnpjLabel === 'CNPJ' ? 'RAZÃO SOCIAL' : 'NOME';
         },
         nomeRazaoSocial() {
+            if (this.modoEdicao || this.modoVisualizacao) {
+                return this.dadosComprovante.nome;
+            }
             return this.agenteEhCadastrado ? this.agente[0].agente.nome : '';
         },
         cpfCnpjParams() {
@@ -547,9 +568,6 @@ export default {
             // Se a modal for fechada, limpar todos os campos do formulário
             if (!value) {
                 setTimeout(this.reset, 500, this.$refs.form.resetValidation);
-            // Se a modal for aberta em modo de edição, pesquisar agente pelo cpf
-            } else if (this.modoEdicao) {
-                this.buscarAgente(this.cpfCnpjParams);
             }
         },
     },
@@ -565,6 +583,9 @@ export default {
             limparAgente: 'avaliacaoResultados/limparAgente',
         }),
         buscarFornecedor(cpfCnpj) {
+            if (this.modoVisualizacao) {
+                return;
+            }
             if (this.cpfCnpjLabel === 'CNPJ') {
                 if (!this.validarCnpj(cpfCnpj)) {
                     return;
@@ -609,15 +630,14 @@ export default {
         },
         // Modo Visualização
         prepararVisualizacao() {
-            this.preencherInputs();
             this.modoVisualizacao = true;
+            this.preencherInputs();
             this.dialog = true;
         },
         preencherInputs() {
-            const dados = this.dadosEdicaoComprovante;
+            const dados = this.dadosComprovante;
             this.cpfCnpjLabel = dados.CNPJCPF.length > 11 ? 'CNPJ' : 'CPF';
             this.cpfCnpj = dados.CNPJCPF;
-            // this.nomeRazaoSocial = this.nomeRazaoSocialProps;
             this.tipoComprovante = parseInt(dados.tipo, 10);
             this.dataEmissao = dados.dataEmissao.slice(0, 10);
             this.numero = dados.numero;
@@ -660,16 +680,16 @@ export default {
                     forma: this.formaPagamento,
                     numeroDocumento: this.numeroDocumentoPagamento,
                     valor: this.valorNumber(this.valor),
-                    valorAntigo: this.dadosEdicaoComprovante.valor,
+                    valorAntigo: this.dadosComprovante.valor,
                     valorPermitido: this.valorNumber(this.valorComprovar),
                     justificativa: this.justificativa,
                     foiAtualizado: this.foiAtualizado,
                 };
 
                 if (this.modoEdicao) {
-                    comprovante['_index'] = parseInt(this.dadosEdicaoComprovante.idComprovantePagamento, 10);
-                    comprovante.id = parseInt(this.dadosEdicaoComprovante.idComprovantePagamento, 10);
-                    comprovante.idComprovantePagamento = parseInt(this.dadosEdicaoComprovante.idComprovantePagamento, 10);
+                    comprovante['_index'] = parseInt(this.dadosComprovante.idComprovantePagamento, 10);
+                    comprovante.id = parseInt(this.dadosComprovante.idComprovantePagamento, 10);
+                    comprovante.idComprovantePagamento = parseInt(this.dadosComprovante.idComprovantePagamento, 10);
                 }
 
                 const comprovanteJSON = JSON.stringify(comprovante);

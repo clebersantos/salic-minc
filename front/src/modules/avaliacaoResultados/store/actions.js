@@ -466,8 +466,8 @@ export const excluirComprovante = ({ commit }, params) => {
         });
 };
 
-export const carregarDadosEdicaoComprovante = ({ commit }, params) => {
-    commit(types.DADOS_EDICAO_COMPROVANTE, params);
+export const carregarDadosComprovante = ({ commit }, params) => {
+    commit(types.DADOS_COMPROVANTE, params);
 };
 
 export const dashboardQuantidades = ({ commit }) => {
