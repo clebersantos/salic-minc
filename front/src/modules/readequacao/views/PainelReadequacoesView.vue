@@ -204,6 +204,7 @@ export default {
             minChar: {
                 solicitacao: 3,
                 justificativa: 10,
+                dataExecucao: 10,
             },
             abaInicial: '#edicao',
             loaded: {

@@ -41,7 +41,7 @@
                         <v-text-field
                             :label="campo.titulo"
                             :value="dadosReadequacaoEmEdicao.dsSolicitacao"
-                            :rules="rules"
+                            :rules="[rules.required, rules.solicitacao]"
                             counter
                             @input="updateCampo"
                         />
@@ -72,8 +72,8 @@ export default {
             default: 0,
         },
         rules: {
-            type: Array,
-            default: () => [],
+            type: Object,
+            default: () => {},
         },
     },
     data() {

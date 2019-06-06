@@ -114,6 +114,10 @@ export default {
             type: [Number, String],
             default: 0,
         },
+        readequacaoEditada: {
+            type: Object,
+            default: () => {},
+        },
     },
     data() {
         return {
@@ -144,6 +148,7 @@ export default {
     },
     methods: {
         ...mapActions({
+            updateReadequacao: 'readequacao/updateReadequacao',
             finalizarReadequacao: 'readequacao/finalizarReadequacao',
         }),
         validar() {
@@ -164,7 +169,7 @@ export default {
                 }
             }
         },
-        finalizar() {
+        executaFinalizar() {
             this.finalizarReadequacao({
                 idReadequacao: this.dadosReadequacao.idReadequacao,
                 idPronac: this.dadosReadequacao.idPronac,
@@ -173,6 +178,19 @@ export default {
                     this.$emit('readequacao-finalizada');
                     this.dialog = false;
                 });
+        },
+        finalizar() {
+            if (typeof this.readequacaoEditada !== 'undefined') {
+                if ((this.readequacaoEditada.dsJustificativa !== this.dadosReadequacao.dsJustificativa)
+                    || (this.readequacaoEditada.dsSolicitacao !== this.dadosReadequacao.dsSolicitacao)) {
+                    this.updateReadequacao(this.readequacaoEditada)
+                        .then(() => {
+                            this.executaFinalizar();
+                        });
+                }
+            } else {
+                this.executaFinalizar();
+            }
         },
     },
 };

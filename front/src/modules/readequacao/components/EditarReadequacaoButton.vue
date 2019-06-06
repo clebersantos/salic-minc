@@ -77,7 +77,7 @@
                                 :dados-readequacao="dadosReadequacao"
                                 :campo="getDadosCampo"
                                 :min-char="minChar.solicitacao"
-                                :rules="rules.solicitacao"
+                                :rules="rules"
                                 @dados-update="atualizarCampo($event, 'dsSolicitacao')"
                                 @editor-texto-counter="atualizarContador($event, 'solicitacao')"
                             />
@@ -90,7 +90,7 @@
                             >
                                 Justificativa da readequação
                             </v-card-title>
-                            <form-readequacao
+                            <form-justificativa
                                 :dados-readequacao="dadosReadequacao"
                                 :min-char="minChar.justificativa"
                                 @dados-update="atualizarCampo($event, 'dsJustificativa')"
@@ -152,6 +152,7 @@
                                         :dados-readequacao="dadosReadequacao"
                                         :dados-projeto="dadosProjeto"
                                         :tela-edicao="true"
+                                        :readequacao-editada="readequacaoEditada"
                                         dark
                                         @readequacao-finalizada="readequacaoFinalizada()"
                                     />
@@ -183,7 +184,7 @@
 import _ from 'lodash';
 import { mapActions, mapGetters } from 'vuex';
 import Carregando from '@/components/CarregandoVuetify';
-import FormReadequacao from './FormReadequacao';
+import FormJustificativa from './FormJustificativa';
 import TemplateTextarea from './TemplateTextarea';
 import TemplateInput from './TemplateInput';
 import TemplateDate from './TemplateDate';
@@ -198,7 +199,7 @@ export default {
     components: {
         Carregando,
         FinalizarButton,
-        FormReadequacao,
+        FormJustificativa,
         TemplateTextarea,
         TemplateInput,
         TemplateDate,
@@ -270,14 +271,12 @@ export default {
                 justificativa: 0,
             },
             rules: {
-                solicitacao: [
-                    v => !!v || 'Campo obrigatório.',
-                    v => (v && v.length >= this.minChar.solicitacao) || `Deve ter no mínimo ${this.minChar.solicitacao} caracteres.`,
-                ],
-                justificativa: [
-                    v => !!v || 'Preencha a justificativa.',
-                    v => (v && v.length >= this.minChar.justificativa) || `Justificativa ter no mínimo ${this.minChar.justificativa} caracteres.`,
-                ],
+                required: v => !!v || 'Campo obrigatório.',
+                dataExecucaoChars: v => (v && v.length >= this.minChar.dataExecucao) || 'Data em formato inválido',
+                dataExecucao: v => (v !== this.getValorCampoAtual()) || 'Data deve ser diferente da original.',
+                solicitacao: v => (v && v.length >= this.minChar.solicitacao) || `Deve ter no mínimo ${this.minChar.solicitacao} caracteres.`,
+                justificativa: v => (v && v.length >= this.minChar.justificativa)
+                    || `Justificativa ter no mínimo ${this.minChar.justificativa} caracteres.`,
             },
             campos: [
                 'dsSolicitacao',
@@ -436,21 +435,34 @@ export default {
             });
         },
         atualizarCampo(valor, campo) {
-            if (this.campos.includes(campo)) {
-                this.readequacaoEditada[campo] = valor;
-                this.validar();
+            if (typeof this.readequacaoEditada.idTipoReadequacao !== 'undefined') {
+                if (this.campos.includes(campo)) {
+                    this.readequacaoEditada[campo] = valor;
+                    this.validar();
+                }
             }
         },
         atualizarContador(valor, campo) {
             this.contador[campo] = valor;
-            this.validar();
         },
         validar() {
-            this.validacao = this.validarFormulario(
-                this.readequacaoEditada,
-                this.contador,
-                this.minChar,
-            );
+            if (typeof this.dadosReadequacao.idTipoReadequacao !== 'undefined') {
+                this.validacao = this.validarFormulario(
+                    this.readequacaoEditada,
+                    this.contador,
+                    this.minChar,
+                    this.campoAtual[`key_${this.dadosReadequacao.idTipoReadequacao}`].dsCampo,
+                );
+            }
+        },
+        getValorCampoAtual() {
+            if (typeof this.dadosReadequacao.idReadequacao === 'number') {
+                const key = `key_${this.dadosReadequacao.idTipoReadequacao}`;
+                if (typeof this.campoAtual[key] !== 'undefined') {
+                    return this.campoAtual[key].dsCampo;
+                }
+            }
+            return false;
         },
         readequacaoFinalizada() {
             this.dialog = false;
