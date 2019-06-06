@@ -10,7 +10,9 @@
                 </v-btn>
                 <v-toolbar-title>Projeto XXX</v-toolbar-title>
             </v-toolbar>
-            <v-container>
+            <v-container fluid>
+                <DetalhesProjeto/>
+                <DetalhesItem/>
                 <v-subheader>
                     Item:
                 </v-subheader>
@@ -57,16 +59,16 @@
 import Vue from 'vue';
 import { mapActions, mapGetters } from 'vuex';
 import Moeda from '../../../../filters/money';
-import ComprovarPagamento from './ComprovarPagamento';
-import ExcluirComprovante from './ExcluirComprovante';
+import DetalhesProjeto from './DetalhesProjeto';
+import DetalhesItem from './DetalhesItem';
 
 Vue.filter('moedaMasck', Moeda);
 
 export default {
     name: 'Comprovante',
     components: {
-        ComprovarPagamento,
-        ExcluirComprovante,
+        DetalhesProjeto,
+        DetalhesItem,
     },
     filters: {
         dataMasck(data) {
