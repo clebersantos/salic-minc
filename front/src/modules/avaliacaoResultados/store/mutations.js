@@ -56,7 +56,7 @@ export const state = {
     statusCriarComprovante: {},
     nfe: {},
     statusComprovante: {},
-    dadosEdicaoComprovante: {},
+    dadosComprovante: {},
 };
 
 export const mutations = {
@@ -274,8 +274,8 @@ export const mutations = {
     [types.STATUS_COMPROVANTE](state, dados) {
         state.statusComprovante = dados;
     },
-    [types.DADOS_EDICAO_COMPROVANTE](state, dados) {
-        state.dadosEdicaoComprovante = dados;
+    [types.DADOS_COMPROVANTE](state, dados) {
+        state.dadosComprovante = dados;
     },
     [types.SET_NFE](state, dados) {
         state.nfe = dados;

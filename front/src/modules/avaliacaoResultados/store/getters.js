@@ -44,4 +44,4 @@ export const buscarAgente = state => state.agente;
 export const statusCriarComprovante = state => state.statusCriarComprovante;
 export const getNFe = state => state.nfe;
 export const statusComprovante = state => state.statusComprovante;
-export const dadosEdicaoComprovante = state => state.dadosEdicaoComprovante;
+export const dadosComprovante = state => state.dadosComprovante;
