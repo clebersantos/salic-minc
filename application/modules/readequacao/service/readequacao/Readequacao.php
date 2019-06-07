@@ -509,6 +509,21 @@ class Readequacao implements IServicoRestZend
             }
         }
 
+        if ($parametros['idTipoReadequacao'] == \Readequacao_Model_DbTable_TbReadequacao::TIPO_READEQUACAO_PERIODO_EXECUCAO) {
+            if (strpos($parametros['dsSolicitacao'], '-')) {
+                $data = explode('-', $parametros['dsSolicitacao']);
+                $parametros['dsSolicitacao'] = implode('/', array_reverse($data));
+            }
+        }
+        if ($parametros['idTipoReadequacao'] == \Readequacao_Model_DbTable_TbReadequacao::TIPO_READEQUACAO_ALTERACAO_PROPONENTE) {
+            if (strpos($parametros['dsSolicitacao'], '.')) {
+                $parametros['dsSolicitacao'] = preg_replace('/[^0-9]/', '', $parametros['dsSolicitacao']);
+            }
+        }
+        if ($parametros['idTipoReadequacao'] == \Readequacao_Model_DbTable_TbReadequacao::TIPO_READEQUACAO_AGENCIA_BANCARIA) {
+            $parametros['dsSolicitacao'] = preg_replace('/[^0-9\-x]/', '', $parametros['dsSolicitacao']);
+        }
+        
         $mapper = new \Readequacao_Model_TbReadequacaoMapper();
         $idReadequacao = $mapper->salvarSolicitacaoReadequacao($parametros);
 
