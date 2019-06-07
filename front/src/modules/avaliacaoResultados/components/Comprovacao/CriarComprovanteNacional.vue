@@ -38,14 +38,16 @@
                 <v-toolbar-title v-else>Criar Comprovante</v-toolbar-title>
                 <v-spacer/>
             </v-toolbar>
-            <v-card-text>
+            <v-card-text id="start">
                 <v-form
                     ref="form"
                     v-model="valid"
                     lazy-validation
                 >
                     <v-container>
-                        <h3 class="mb-2">IDENTIFICAÇÃO DO CONTRATADO</h3>
+                        <h3 class="mb-2">
+                            IDENTIFICAÇÃO DO CONTRATADO
+                        </h3>
                         <v-layout
                             row
                             wrap
@@ -568,6 +570,7 @@ export default {
             // Se a modal for fechada, limpar todos os campos do formulário
             if (!value) {
                 setTimeout(this.reset, 500, this.$refs.form.resetValidation);
+                document.getElementById('start').scrollTo(0, 0);
             }
         },
     },
