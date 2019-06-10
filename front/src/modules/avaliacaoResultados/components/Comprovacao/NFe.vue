@@ -1,55 +1,89 @@
 <template>
-    <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+    <v-dialog
+        v-model="dialog"
+        fullscreen
+        hide-overlay
+        transition="dialog-bottom-transition"
+    >
         <template v-slot:activator="{ on }">
-            <v-btn color="primary" dark v-on="on">NFe</v-btn>
+            <v-btn
+                color="primary"
+                dark
+                v-on="on">
+                NFe
+            </v-btn>
         </template>
         <v-card>
-            <v-toolbar dark color="primary">
-                <v-btn icon dark @click="dialog = false">
+            <v-toolbar
+                dark
+                color="primary"
+            >
+                <v-btn
+                    icon
+                    dark
+                    @click="dialog = false"
+                >
                     <v-icon>close</v-icon>
                 </v-btn>
-                <v-toolbar-title>Projeto XXX</v-toolbar-title>
+                <v-toolbar-title>{{ projeto.idpronac }} - {{ projeto.nome }}</v-toolbar-title>
             </v-toolbar>
             <v-container fluid>
-                <DetalhesProjeto/>
-                <DetalhesItem/>
-                <v-subheader>
-                    Item:
-                </v-subheader>
-                <v-flex xs12 sm12 md12>
-                    <v-text-field
-                        label="Código de Acesso"
-                        placeholder="0000 0000 0000 0000 0000 0000 0000 000 0000 0000 0000"
-                        outline
-                        v-model="chaveAcesso"
-                    ></v-text-field>
-                    <v-btn
-                        @click="buscarNFe()"
-                        dark
-                    >
-                        Buscar
-                    </v-btn>
-                </v-flex>
-                <v-flex
-                    v-if="produtos"
-                    xs12
-                    sm6
-                    d-flex
+                <DetalhesItem
+                    :dadosItem="{
+                        Item: item.value,
+                        Produto: produto.value,
+                        Etapa: etapa.value,
+                        uf: uf.value,
+                        cidade: cidade.value,
+                        vlAprovado: item.varlorAprovado,
+                        vlComprovado: item.varlorComprovado,
+                    }"
+                />
+
+                <v-layout
+                    align-start
+                    justify-center
+                    row
                 >
-                    <v-select
-                        :items="[produtos]"
-                        item-text="xProd"
-                        item-value="cProd"
-                        label="Produto"
-                        outline
-                        ></v-select>
-                </v-flex>
-                <v-btn 
-                    v-if="produtos"
-                    dark  
-                    @click="dialog = false">
-                    Salvar
-                </v-btn>
+                    <v-flex>
+                        <v-text-field
+                            v-model="chaveAcesso"
+                            label="Código de Acesso"
+                            placeholder="0000000000000000000000000000000000000000000"
+                            outline
+                        />
+                    </v-flex>
+                    <v-flex>
+                        <v-btn
+                            dark
+                            @click="buscarNFe()"
+                        >
+                            Buscar
+                        </v-btn>
+                    </v-flex>
+                </v-layout>
+                <v-layout
+                    v-if="Object.keys(produtos).length > 0"
+                    row
+                >
+                    <v-flex
+                        xs12
+                        sm6
+                    >
+                        <v-select
+                            :items="[prod]"
+                            item-text="xProd"
+                            item-value="cProd"
+                            label="Produto"
+                            outline
+                        />
+                    </v-flex>
+                    <v-btn
+                        dark
+                        @click="submit()">
+                        Salvar
+                    </v-btn>
+                </v-layout>
             </v-container>
         </v-card>
     </v-dialog>
@@ -65,95 +99,92 @@ import DetalhesItem from './DetalhesItem';
 Vue.filter('moedaMasck', Moeda);
 
 export default {
-    name: 'Comprovante',
+    name: 'NFe',
     components: {
         DetalhesProjeto,
         DetalhesItem,
     },
-    filters: {
-        dataMasck(data) {
-            const dataFormatada = data.replace(/-/g, '/');
-            const date = new Date(dataFormatada);
-            return date.toLocaleString(['pt-BR'], {
-                month: '2-digit',
-                day: '2-digit',
-                year: '2-digit',
-            });
-        },
-    },
     props: {
-        idPronac: { type:[String, Number] , default: '' },
-        idPlanilhaItens: { type: [String, Number], default: '' },
-        produto: { type: [String, Number], default: '' },
-        uf: { type: String, default: '' },
-        idUf: { type: [String, Number], default: '' },
-        cidade: { type: [String, Number], default: '' },
-        etapa: { type: [String, Number], default: '' },
-        tipo: { type: String, default: '' },
+        projeto: { type: Object, default: () => {} },
+        produto: { type: Object, default: () => {} },
+        etapa: { type: Object, default: () => {} },
+        uf: { type: Object, default: () => {} },
+        cidade: { type: Object, default: () => {} },
+        item: { type: Object, default: () => {} },
+        idPlanilhaAprovacao: { type: [String, Number], default: ''  },
     },
     data() {
         return {
             chaveAcesso: '',
-            comprovanteParams: {
-                idPronac: this.idPronac,
-                idPlanilhaItens: this.idPlanilhaItens,
-                codigoProduto: this.produto,
-                uf: this.uf,
-                idUf: this.idUf,
-                codigoCidade: this.cidade,
-                codigoEtapa: this.etapa,
-                tipo: this.tipo,
-            },
-            getter: `avaliacaoResultados/${this.tipo === 'nacional' ? 'listarComprovantesNacionais' : 'listarComprovantesInternacionais'}`,
-            headers: [
-                {
-                    text: 'Fornecedor',
-                    align: 'left',
-                    sortable: false,
-                    value: 'fornecedor',
-                },
-                {
-                    text: 'Valor',
-                    align: 'left',
-                    sortable: false,
-                    value: 'valor',
-                },
-                {
-                    text: 'Ações',
-                    align: 'center',
-                    sortable: false,
-                    value: 'acoes',
-                },
-            ],
             dialog: false,
+            produtos: false,
         };
     },
     computed: {
         ...mapGetters({
             getNFe: 'avaliacaoResultados/getNFe',
         }),
-        comprovantes() {
-            return this.$store.getters[this.getter];
-        },
-        produtos() {
+        prod() {
             return Object.keys(this.getNFe).length > 0 ? this.getNFe.data.NFe.infNFe.det.prod : false;
         },
     },
-    created() {
-        this.buscarNFeAction();
-    },
-    mounted() {
-        this.listarComprovantes(this.comprovanteParams);
-        this.$root.$on('recarregar-comprovantes', () => this.listarComprovantes(this.comprovanteParams));
+    watch: {
+        getNFe(val) {
+            this.produtos = (Object.keys(val).length > 0) ? val.data.NFe.infNFe.det.prod : false;
+        },
     },
     methods: {
         ...mapActions({
-            listarComprovantes: 'avaliacaoResultados/listarComprovantes',
-            excluirComprovante: 'avaliacaoResultados/excluirComprovante',
             buscarNFeAction: 'avaliacaoResultados/buscarNFeAction',
+            criarComprovante: 'avaliacaoResultados/criarComprovante',
         }),
         buscarNFe() {
             this.buscarNFeAction(this.chaveAcesso);
+        },
+
+        submit() {
+            const formData = new FormData();
+            const nota = this.getNFe.data.NFe.infNFe;
+
+            const comprovante = {
+                fornecedor: {
+            /*         nacionalidade: 31, */
+            /*         tipoPessoa: this.cpfCnpjLabel === 'CPF' ? 1 : 2, */
+                    CNPJCPF: nota.emit.CNPJ,
+                    nome: nota.emit.xNome,
+                    eInternacional: false,
+                },
+                item: this.item.id,
+                idPlanilhaAprovacao: this.idPlanilhaAprovacao,
+                tipo: 6,
+                numero: nota.ide.nNF,
+                serie: nota.ide.serie,
+                dataEmissao: nota.ide.dhEmi,
+                dataPagamento: nota.ide.dhEmi,
+                forma: 3,
+            /*     numeroDocumento: this.numeroDocumentoPagamento, */
+                valor: nota.pag.detPag.vPag,
+                justificativa: 'NF-e',
+            };
+            /* console.log(comprovante); */
+            /* console.log(this.getNFe.data.NFe.infNFe); */
+            /* return; */
+
+            /* if (this.modoEdicao) { */
+            /*     comprovante['_index'] = parseInt(this.dadosComprovante.idComprovantePagamento, 10); */
+            /*     comprovante.id = parseInt(this.dadosComprovante.idComprovantePagamento, 10); */
+            /*     comprovante.idComprovantePagamento = parseInt(this.dadosComprovante.idComprovantePagamento, 10); */
+            /* } */
+
+            const comprovanteJSON = JSON.stringify(comprovante);
+            formData.append('comprovante', comprovanteJSON);
+            /* formData.append('arquivo', this.arquivo); */
+
+            // if (this.modoEdicao) {
+            //     this.editarComprovante(formData);
+            // } else {
+                this.criarComprovante(formData);
+            // }
         },
     },
 };

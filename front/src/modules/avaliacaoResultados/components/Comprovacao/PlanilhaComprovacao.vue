@@ -177,14 +177,20 @@
                                                                 </v-tooltip>
                                                                 <NFe
                                                                     v-bind="{
-                                                                        idpronac: idPronac,
-                                                                        idUf: uf.cdUF,
-                                                                        uf: uf.Uf,
-                                                                        produto: produto.cdProduto,
-                                                                        cidade: cidade.cdCidade,
-                                                                        etapa: etapa.cdEtapa,
+                                                                        uf:{id: uf.cdUF, value: uf.Uf},
+                                                                        produto:{id: produto.cdProduto, value: produto.produto},
+                                                                        cidade:{id: cidade.cdCidade, value: cidade.cidade},
+                                                                        etapa: { id: etapa.cdEtapa, value: etapa.etapa },
                                                                         idPlanilhaAprovacao: props.item.idPlanilhaAprovacao,
                                                                         idPlanilhaItens: props.item.idPlanilhaItens,
+                                                                        item: {
+                                                                            id: props.item.idPlanilhaItens,
+                                                                            value: props.item.item,
+                                                                            varlorAprovado: props.item.varlorAprovado,
+                                                                            varlorComprovado: props.item.varlorComprovado,
+                                                                            varlorAprovado: props.item.varlorAprovado
+                                                                        },
+                                                                        projeto:{idpronac: idPronac, nome: dadosProjeto.items.nomeProjeto}
                                                                     }"
                                                                 />
                                                             </td>
