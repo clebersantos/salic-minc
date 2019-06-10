@@ -166,7 +166,7 @@ class CaptacaoController extends MinC_Controller_Action_Abstract
             'logon' => $post->logon,
             'CgcCpfMecena' => $post->cpf,
             'DtRecibo' => data::dataAmericana($post->dt_recibo),
-            'DtChegadaRecibo' => data::dataAmericana($post->dt_minc),
+            'DtChegadaRecibo' => data::dataAmericana($post->dt_recibo),
             'TipoApoio' => $post->tpApoio,
             'CaptacaoReal' => $post->valor,
             'CaptacaoUfir' => $post->valor

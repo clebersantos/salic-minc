@@ -10,6 +10,7 @@ class CaptacaoDAO extends Zend_Db_Table
 
     public static function cadastrar($dados)
     {
+        xd($dados);
         $db= Zend_Db_Table::getDefaultAdapter();
         $db->setFetchMode(Zend_DB::FETCH_OBJ);
 
@@ -126,7 +127,7 @@ class CaptacaoDAO extends Zend_Db_Table
         $db->setFetchMode(Zend_DB::FETCH_OBJ);
         return $db->fetchAll($sql);
     }
-    
+
     public static function buscarCaptacao($pronac)
     {
         $sql = "select SUM(CaptacaoReal) as captado from SAC.dbo.Captacao 
@@ -136,7 +137,7 @@ class CaptacaoDAO extends Zend_Db_Table
         $db->setFetchMode(Zend_DB::FETCH_OBJ);
         return $db->fetchAll($sql);
     } // fecha m�todo buscarErro()
-    
+
 
     /**
      * M�todo para gerar o relat�rio com as capta��es contendo erros
@@ -219,5 +220,5 @@ class CaptacaoDAO extends Zend_Db_Table
         $db= Zend_Db_Table::getDefaultAdapter();
         $db->setFetchMode(Zend_DB::FETCH_OBJ);
         return $db->fetchAll($sql);
-    } 
-} 
+    }
+}

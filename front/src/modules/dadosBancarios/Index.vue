@@ -1,8 +1,10 @@
 <template>
     <div id="app">
-        <v-app >
+        <v-app :dark="isModoNoturno">
+            <SlNav/>
             <v-content>
                 <v-container
+                    v-if="Object.keys(usuario).length > 0"
                     fluid>
                     <v-layout>
                         <v-fade-transition mode="out-in">
@@ -11,6 +13,18 @@
                     </v-layout>
                 </v-container>
             </v-content>
+
+            <v-snackbar
+                v-model="snackbar"
+                :color="getSnackbar.color"
+                :top="true"
+                :left="true"
+                :timeout="2000"
+                @input="fecharSnackbar"
+            >
+                {{ getSnackbar.text }}
+            </v-snackbar>
+            <Rodape/>
         </v-app>
     </div>
 </template>
@@ -18,10 +32,11 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import Rodape from '@/components/layout/footer';
+import SlNav from './components/SlNav';
 
 export default {
     name: 'Index',
-    components: { Rodape },
+    components: { SlNav, Rodape },
     data() {
         return {
             dark: false,
@@ -41,8 +56,12 @@ export default {
         },
     },
     created() {
+        this.recoverAction();
     },
     mounted() {
+        this.setSnackbar({ ativo: false, color: 'success' });
+        this.setUsuario();
+        this.obterModoNoturno();
     },
     methods: {
         ...mapActions({
