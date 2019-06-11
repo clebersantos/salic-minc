@@ -57,7 +57,7 @@ export const state = {
     nfe: {},
     statusComprovante: {},
     dadosComprovante: {},
-    carregarPaises: {},
+    carregarPaises: [],
 };
 
 export const mutations = {

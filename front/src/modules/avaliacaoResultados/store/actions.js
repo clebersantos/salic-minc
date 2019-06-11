@@ -507,7 +507,7 @@ export const carregarPaises = ({ commit }) => {
     avaliacaoResultadosHelperAPI.carregarPaises()
         .then((response) => {
             const { data } = response;
-            commit(types.CARREGAR_PAISES, data);
+            commit(types.CARREGAR_PAISES, Object.values(data));
         }).catch((e) => {
             throw new TypeError(e.response.data.message, 'error', 10);
         });

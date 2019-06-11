@@ -11,6 +11,16 @@
             :data-fim="dadosProjeto.dtFimExecucao"
             :valor-comprovar="valorComprovar | moedaFilter"
         />
+        <criar-comprovante-internacional
+            v-if="dadosProjeto.dtInicioExecucao"
+            :id-planilha-itens="String(idPlanilhaItens)"
+            :id-planilha-aprovacao="String(idPlanilhaAprovacao)"
+            :data-inicio-formatada="dadosProjeto.dtInicioExecucao | dataFilter"
+            :data-fim-formatada="dadosProjeto.dtFimExecucao | dataFilter"
+            :data-inicio="dadosProjeto.dtInicioExecucao"
+            :data-fim="dadosProjeto.dtFimExecucao"
+            :valor-comprovar="valorComprovar | moedaFilter"
+        />
         <!-- Excluir Comprovante -->
         <excluir-comprovante/>
 
@@ -103,6 +113,7 @@ import { mapActions, mapGetters } from 'vuex';
 import Moeda from '../../../../filters/money';
 import ListaComprovantes from './ListaComprovantes';
 import CriarComprovanteNacional from './CriarComprovanteNacional';
+import CriarComprovanteInternacional from './CriarComprovanteInternacional';
 import ExcluirComprovante from './ExcluirComprovante';
 import DetalhesProjeto from './DetalhesProjeto';
 import DetalhesItem from './DetalhesItem';
@@ -115,6 +126,7 @@ export default {
     components: {
         ListaComprovantes,
         CriarComprovanteNacional,
+        CriarComprovanteInternacional,
         ExcluirComprovante,
         DetalhesProjeto,
         DetalhesItem,
