@@ -23,7 +23,24 @@
             :dados-item="dadosItem"
             :valor-comprovar="valorComprovar"
         />
-
+        <NFe
+            v-bind="{
+            uf:{ id: uf, value: uf},
+            produto:{ id: produto, value: produto.produto},
+            cidade:{ id: cidade.cdCidade, value: cidade.cidade},
+            etapa: { id: etapa, value: dadosItem.Etapa },
+            idPlanilhaAprovacao: idPlanilhaAprovacao,
+            idPlanilhaItens: idPlanilhaItens,
+            item: {
+                id: idPlanilhaItens,
+                value: dadosItem.Etapa,
+                varlorAprovado: dadosProjeto.varlorAprovado,
+                varlorComprovado: dadosProjeto.varlorComprovado,
+                varlorAprovado: dadosProjeto.varlorAprovado
+            },
+            projeto:{ idpronac: idPronac, nome: dadosProjeto.nomeProjeto }
+            }"
+        />
         <v-card class="mt-3">
             <v-card-title primary-title>
                 <h2>Comprovantes Nacionais</h2>
@@ -89,6 +106,7 @@ import CriarComprovanteNacional from './CriarComprovanteNacional';
 import ExcluirComprovante from './ExcluirComprovante';
 import DetalhesProjeto from './DetalhesProjeto';
 import DetalhesItem from './DetalhesItem';
+import NFe from './NFe';
 
 Vue.filter('moedaFilter', Moeda);
 
@@ -100,6 +118,7 @@ export default {
         ExcluirComprovante,
         DetalhesProjeto,
         DetalhesItem,
+        NFe,
     },
     filters: {
         dataFilter(data) {

@@ -27,62 +27,69 @@
                 </v-btn>
                 <v-toolbar-title>{{ projeto.idpronac }} - {{ projeto.nome }}</v-toolbar-title>
             </v-toolbar>
-            <v-container fluid>
-                <DetalhesItem
-                    :dadosItem="{
-                        Item: item.value,
-                        Produto: produto.value,
-                        Etapa: etapa.value,
-                        uf: uf.value,
-                        cidade: cidade.value,
-                        vlAprovado: item.varlorAprovado,
-                        vlComprovado: item.varlorComprovado,
-                    }"
-                />
-
-                <v-layout
-                    align-start
-                    justify-center
-                    row
-                >
-                    <v-flex>
-                        <v-text-field
-                            v-model="chaveAcesso"
-                            label="Código de Acesso"
-                            placeholder="0000000000000000000000000000000000000000000"
-                            outline
-                        />
-                    </v-flex>
-                    <v-flex>
-                        <v-btn
-                            dark
-                            @click="buscarNFe()"
-                        >
-                            Buscar
-                        </v-btn>
-                    </v-flex>
-                </v-layout>
-                <v-layout
-                    v-if="Object.keys(produtos).length > 0"
-                    row
-                >
+            <v-container
+                fluid
+                grid-list-lg>
+                <v-layout column wrap>
                     <v-flex
-                        xs12
+                        xs6
                         sm6
                     >
-                        <v-select
-                            :items="[prod]"
-                            item-text="xProd"
-                            item-value="cProd"
-                            label="Produto"
-                            outline
-                        />
+                        <v-card>
+                            <v-card-text>
+                            <v-layout
+                                align-start
+                                justify-center
+                                row
+                            >
+                                <v-flex>
+                                    <v-text-field
+                                        v-model="chaveAcesso"
+                                        label="Código de Acesso"
+                                        placeholder="0000000000000000000000000000000000000000000"
+                                        outline
+                                        />
+                                </v-flex>
+                                <v-flex>
+                                    <v-btn
+                                        dark
+                                        @click="buscarNFe()"
+                                        >
+                                        Buscar
+                                    </v-btn>
+                                </v-flex>
+                            </v-layout>
+                            <v-layout
+                                v-if="Object.keys(produtos).length > 0"
+                                row
+                            >
+                                <v-flex
+                                    xs12
+                                    sm12
+                                >
+                                    <v-select
+                                        :items="[prod]"
+                                        item-text="xProd"
+                                        item-value="cProd"
+                                        label="Produto"
+                                        outline
+                                    />
+                                    <v-textarea
+                                        v-model="justificativa"
+                                        outline
+                                        name="input-7-4"
+                                        label="Justificativa"
+                                    />
+                                    <v-btn
+                                        dark
+                                        @click="submit()">
+                                        Salvar
+                                    </v-btn>
+                                </v-flex>
+                            </v-layout>
+                            </v-card-text>
+                        </v-card>
                     </v-flex>
-                    <v-btn
-                        dark
-                        @click="submit()">
-                        Salvar
-                    </v-btn>
                 </v-layout>
             </v-container>
         </v-card>
@@ -118,6 +125,7 @@ export default {
             chaveAcesso: '',
             dialog: false,
             produtos: false,
+            justificativa: 'NF-e',
         };
     },
     computed: {
@@ -146,6 +154,10 @@ export default {
             const formData = new FormData();
             const nota = this.getNFe.data.NFe.infNFe;
 
+            let d = new Date(nota.ide.dhEmi).toLocaleString("pt-BR", {timeZone: "America/Sao_Paulo"});
+            d = new Date(d);
+            d = d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
+
             const comprovante = {
                 fornecedor: {
             /*         nacionalidade: 31, */
@@ -159,12 +171,12 @@ export default {
                 tipo: 6,
                 numero: nota.ide.nNF,
                 serie: nota.ide.serie,
-                dataEmissao: nota.ide.dhEmi,
-                dataPagamento: nota.ide.dhEmi,
+                dataEmissao: d,
+                dataPagamento: d,
                 forma: 3,
             /*     numeroDocumento: this.numeroDocumentoPagamento, */
                 valor: nota.pag.detPag.vPag,
-                justificativa: 'NF-e',
+                justificativa: this.justificativa,
             };
             /* console.log(comprovante); */
             /* console.log(this.getNFe.data.NFe.infNFe); */

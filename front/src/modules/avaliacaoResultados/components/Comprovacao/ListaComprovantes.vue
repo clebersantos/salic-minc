@@ -10,6 +10,11 @@
                     slot="items"
                     slot-scope="props"
                 >
+                <td>
+                    <v-chip>
+                        {{ tipoComprovante(props.item.tipo) }}
+                    </v-chip>
+                </td>
                     <td>{{ props.item.fornecedor.nome }}</td>
                     <td>R$ {{ props.item.valor | moedaMasck }}</td>
                     <td class="text-xs-center">
@@ -116,6 +121,12 @@ export default {
             getter: `avaliacaoResultados/${this.tipo === 'nacional' ? 'listarComprovantesNacionais' : 'listarComprovantesInternacionais'}`,
             headers: [
                 {
+                    text: 'Tipo',
+                    align: 'left',
+                    sortable: false,
+                    value: 'tipo',
+                },
+                {
                     text: 'Fornecedor',
                     align: 'left',
                     sortable: false,
@@ -166,6 +177,33 @@ export default {
         },
         excluirComprovante(idComprovantePagamento) {
             this.$root.$emit('excluir-comprovante', idComprovantePagamento);
+        },
+        tipoComprovante(value) {
+            let data = '';
+
+            switch (parseInt(value, 10)) {
+                case 1:
+                    data = 'Cupom Fiscal';
+                    break;
+                case 2:
+                    data = 'Guia Recolhimento';
+                    break;
+                case 3:
+                    data = 'Nota Fiscal/Fatura';
+                    break;
+                case 4:
+                    data = 'Recibo Pagamento';
+                    break;
+                case 5:
+                    data = 'RPA';
+                    break;
+                case 6:
+                    data = 'NF-e';
+                    break;
+                default:
+                    data = 'N/A';
+            }
+            return data;
         },
     },
 };
