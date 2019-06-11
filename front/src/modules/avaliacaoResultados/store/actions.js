@@ -503,6 +503,16 @@ export const buscarAgente = ({ commit }, params) => {
         });
 };
 
+export const carregarPaises = ({ commit }) => {
+    avaliacaoResultadosHelperAPI.carregarPaises()
+        .then((response) => {
+            const { data } = response;
+            commit(types.CARREGAR_PAISES, data);
+        }).catch((e) => {
+            throw new TypeError(e.response.data.message, 'error', 10);
+        });
+};
+
 export const limparAgente = ({ commit }) => {
     commit(types.BUSCAR_AGENTE, []);
 };
