@@ -4,7 +4,8 @@
         :text="'Carregando ...'"/>
     <v-container
         v-else
-        fluid>
+        fluid
+    >
         <v-toolbar>
             <!-- Verificar o destino do retorno
             <v-btn
@@ -16,6 +17,7 @@
             </v-btn> -->
             <v-toolbar-title>Prestação de Contas: Comprovação Financeira</v-toolbar-title>
         </v-toolbar>
+
         <v-card>
             <v-card-title primary-title>
                 <h2>{{ dadosProjeto.items.pronac }} &#45; {{ dadosProjeto.items.nomeProjeto }}</h2>
@@ -56,6 +58,15 @@
                     class="ml-1"
                 >VER PROJETO
                 </v-btn>
+
+                <v-btn
+                    :href="'/consultardadosprojeto/index?idPronac=' + idPronac"
+                    color="success"
+                    target="_blank"
+                    class="ml-1"
+                >modal
+                </v-btn>
+
             </v-card-actions>
         </v-card>
         <template v-if="Object.keys(dadosComprovacao).length > 0">
@@ -177,6 +188,7 @@
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-card>
+
         </template>
         <carregando
             v-else
@@ -186,14 +198,17 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import Carregando from '@/components/CarregandoVuetify';
+import NFe from './NFe';
 
 export default {
     name: 'PlanilhaComprovacao',
     components: {
         Carregando,
+        NFe,
     },
     data() {
         return {
+            dialog: false,
             headers: [
                 { text: 'Item de Custo', value: 'item', sortable: false },
                 { text: 'Valor Aprovado', value: 'varlorAprovado', sortable: false },

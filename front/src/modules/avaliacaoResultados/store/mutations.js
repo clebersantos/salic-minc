@@ -53,6 +53,8 @@ export const state = {
     dashboard: {},
     projetosSimilares: [],
     agente: [],
+    statusCriarComprovante: {},
+    nfe: {},
     statusComprovante: {},
     dadosComprovante: {},
 };
@@ -274,5 +276,8 @@ export const mutations = {
     },
     [types.DADOS_COMPROVANTE](state, dados) {
         state.dadosComprovante = dados;
+    },
+    [types.SET_NFE](state, dados) {
+        state.nfe = dados;
     },
 };
