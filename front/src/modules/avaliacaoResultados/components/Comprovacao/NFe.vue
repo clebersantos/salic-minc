@@ -48,7 +48,7 @@
                                         label="Código de Acesso"
                                         placeholder="0000000000000000000000000000000000000000000"
                                         outline
-                                        />
+                                    />
                                 </v-flex>
                                 <v-flex>
                                     <v-btn
@@ -67,6 +67,19 @@
                                     xs12
                                     sm12
                                 >
+                                <h4>
+                                    Fornecedor:
+                                </h4>
+                                <div
+                                    v-if="Object.keys(emissor).length > 0"
+                                >
+                                    CNPJ: {{emissor.CNPJ}}
+                                </div>
+                                <div
+                                    v-if="Object.keys(emissor).length > 0"
+                                >
+                                    Nome: {{emissor.xNome}}
+                                </div>
                                     <v-select
                                         :items="[prod]"
                                         item-text="xProd"
@@ -126,6 +139,8 @@ export default {
             dialog: false,
             produtos: false,
             justificativa: 'NF-e',
+            emissor: {},
+
         };
     },
     computed: {
@@ -139,6 +154,7 @@ export default {
     watch: {
         getNFe(val) {
             this.produtos = (Object.keys(val).length > 0) ? val.data.NFe.infNFe.det.prod : false;
+            this.emissor = (Object.keys(val).length > 0) ? val.data.NFe.infNFe.emit : false;
         },
     },
     methods: {
