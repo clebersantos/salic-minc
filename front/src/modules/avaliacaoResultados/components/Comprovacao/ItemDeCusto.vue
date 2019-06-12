@@ -11,6 +11,16 @@
             :data-fim="dadosProjeto.dtFimExecucao"
             :valor-comprovar="valorComprovar | moedaFilter"
         />
+        <criar-comprovante-internacional
+            v-if="dadosProjeto.dtInicioExecucao"
+            :id-planilha-itens="String(idPlanilhaItens)"
+            :id-planilha-aprovacao="String(idPlanilhaAprovacao)"
+            :data-inicio-formatada="dadosProjeto.dtInicioExecucao | dataFilter"
+            :data-fim-formatada="dadosProjeto.dtFimExecucao | dataFilter"
+            :data-inicio="dadosProjeto.dtInicioExecucao"
+            :data-fim="dadosProjeto.dtFimExecucao"
+            :valor-comprovar="valorComprovar | moedaFilter"
+        />
         <!-- Excluir Comprovante -->
         <excluir-comprovante/>
 
@@ -23,6 +33,14 @@
             :dados-item="dadosItem"
             :valor-comprovar="valorComprovar"
         />
+
+        <v-btn
+            color="primary"
+            dark
+            @click="openNFeModalAction({ open: true, type: 'new' })"
+        >
+            NFe
+        </v-btn>
         <NFe
             v-bind="{
                 uf:{ id: uf, value: uf},
@@ -38,7 +56,8 @@
                     varlorComprovado: dadosProjeto.varlorComprovado,
                     varlorAprovado: dadosProjeto.varlorAprovado
                 },
-                projeto:{ idpronac: idPronac, nome: dadosProjeto.NomeProjeto }
+                projeto:{ idpronac: idPronac, nome: dadosProjeto.NomeProjeto },
+                dialog: nfeModalGetter
             }"
         />
         <v-card class="mt-3">
@@ -103,6 +122,7 @@ import { mapActions, mapGetters } from 'vuex';
 import Moeda from '../../../../filters/money';
 import ListaComprovantes from './ListaComprovantes';
 import CriarComprovanteNacional from './CriarComprovanteNacional';
+import CriarComprovanteInternacional from './CriarComprovanteInternacional';
 import ExcluirComprovante from './ExcluirComprovante';
 import DetalhesProjeto from './DetalhesProjeto';
 import DetalhesItem from './DetalhesItem';
@@ -115,6 +135,7 @@ export default {
     components: {
         ListaComprovantes,
         CriarComprovanteNacional,
+        CriarComprovanteInternacional,
         ExcluirComprovante,
         DetalhesProjeto,
         DetalhesItem,
@@ -141,10 +162,10 @@ export default {
             etapa: this.$route.params.etapa,
             idPlanilhaAprovacao: this.$route.params.idPlanilhaAprovacao,
             idPlanilhaItens: this.$route.params.idPlanilhaItens,
-
             snackbar: false,
             acao: '',
             mensagemFinal: {},
+            nfeModal: false,
         };
     },
     computed: {
@@ -152,6 +173,7 @@ export default {
             dadosProjeto: 'avaliacaoResultados/getDadosProjeto',
             dadosItem: 'avaliacaoResultados/getDadosItem',
             statusComprovante: 'avaliacaoResultados/statusComprovante',
+            nfeModalGetter: 'avaliacaoResultados/nfeModalGetter',
         }),
         dadosItemParams() {
             return {
@@ -196,7 +218,11 @@ export default {
         ...mapActions({
             setDadosProjeto: 'avaliacaoResultados/getDadosProjeto',
             setDadosItem: 'avaliacaoResultados/getDadosItem',
+            openNFeModalAction: 'avaliacaoResultados/openNFeModalAction',
         }),
+        nfeModalOpen() {
+            this.nfeModal = true;
+        },
     },
 };
 </script>

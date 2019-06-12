@@ -45,3 +45,5 @@ export const statusCriarComprovante = state => state.statusCriarComprovante;
 export const getNFe = state => state.nfe;
 export const statusComprovante = state => state.statusComprovante;
 export const dadosComprovante = state => state.dadosComprovante;
+export const carregarPaises = state => state.carregarPaises;
+export const nfeModalGetter = state => state.nfeModal;

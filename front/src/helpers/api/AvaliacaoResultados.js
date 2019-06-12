@@ -195,6 +195,8 @@ export const editarComprovante = (params) => {
 
 export const excluirComprovante = params => api.postRequest('/prestacao-contas/gerenciar/excluir', buildData(params));
 
+export const carregarPaises = () => api.getRequest('/prestacao-contas/gerenciar/pais');
+
 export const dashboardQuantidade = () => api.getRequest('/avaliacao-resultados/dashboard');
 
 export const buscarAgente = params => api.postRequest('/agente/agentes/agentecadastrado/', buildData(params));

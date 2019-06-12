@@ -1,18 +1,10 @@
 <template>
     <v-dialog
-        v-model="dialog"
+        v-model="dialog.open"
         fullscreen
         hide-overlay
         transition="dialog-bottom-transition"
     >
-        <template v-slot:activator="{ on }">
-            <v-btn
-                color="primary"
-                dark
-                v-on="on">
-                NFe
-            </v-btn>
-        </template>
         <v-card>
             <v-toolbar
                 dark
@@ -21,7 +13,7 @@
                 <v-btn
                     icon
                     dark
-                    @click="dialog = false"
+                    @click="openNFeModalAction({open: false, type: null })"
                 >
                     <v-icon>close</v-icon>
                 </v-btn>
@@ -35,6 +27,9 @@
                         xs6
                         sm6
                     >
+                        <v-subheader>
+                            {{ (type == 'new') ? 'Novo' : 'Editar' }} Comprovante
+                        </v-subheader>
                         <v-card>
                             <v-card-text>
                             <v-layout
@@ -131,21 +126,26 @@ export default {
         uf: { type: Object, default: () => {} },
         cidade: { type: Object, default: () => {} },
         item: { type: Object, default: () => {} },
-        idPlanilhaAprovacao: { type: [String, Number], default: ''  },
+        idPlanilhaAprovacao: { type: [String, Number], default: '' },
+        dialog: { type: Object, default: () => {} },
     },
     data() {
         return {
             chaveAcesso: '',
-            dialog: false,
             produtos: false,
             justificativa: 'NF-e',
             emissor: {},
+            type: {},
 
         };
     },
     computed: {
         ...mapGetters({
             getNFe: 'avaliacaoResultados/getNFe',
+            dadosProjeto: 'avaliacaoResultados/getDadosProjeto',
+            dadosItem: 'avaliacaoResultados/getDadosItem',
+            dadosComprovante: 'avaliacaoResultados/dadosComprovante',
+            nfeModalGetter: 'avaliacaoResultados/nfeModalGetter',
         }),
         prod() {
             return Object.keys(this.getNFe).length > 0 ? this.getNFe.data.NFe.infNFe.det.prod : false;
@@ -156,11 +156,21 @@ export default {
             this.produtos = (Object.keys(val).length > 0) ? val.data.NFe.infNFe.det.prod : false;
             this.emissor = (Object.keys(val).length > 0) ? val.data.NFe.infNFe.emit : false;
         },
+        nfeModalGetter(val) {
+            if (val.type === 'edit') {
+                this.buscarNFe();
+            }
+            this.type = val.type;
+        },
+    },
+    mounted() {
+
     },
     methods: {
         ...mapActions({
             buscarNFeAction: 'avaliacaoResultados/buscarNFeAction',
             criarComprovante: 'avaliacaoResultados/criarComprovante',
+            openNFeModalAction: 'avaliacaoResultados/openNFeModalAction',
         }),
         buscarNFe() {
             this.buscarNFeAction(this.chaveAcesso);

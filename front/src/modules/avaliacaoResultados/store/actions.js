@@ -503,6 +503,16 @@ export const buscarAgente = ({ commit }, params) => {
         });
 };
 
+export const carregarPaises = ({ commit }) => {
+    avaliacaoResultadosHelperAPI.carregarPaises()
+        .then((response) => {
+            const { data } = response;
+            commit(types.CARREGAR_PAISES, Object.values(data));
+        }).catch((e) => {
+            throw new TypeError(e.response.data.message, 'error', 10);
+        });
+};
+
 export const limparAgente = ({ commit }) => {
     commit(types.BUSCAR_AGENTE, []);
 };
@@ -518,4 +528,8 @@ export const buscarNFeAction = ({ commit }, params) => {
         }).catch((e) => {
             throw new TypeError(e.response.data.message, 'error', 10);
         });
+};
+
+export const openNFeModalAction = ({ commit }, params) => {
+    commit(types.SET_NFE_MODAL, params);
 };

@@ -49,13 +49,14 @@
                             </v-btn>
                             <span>Editar</span>
                         </v-tooltip>
+
                             <v-btn
                                 v-if="props.item.tipo == 6"
                                 slot="activator"
                                 flat
                                 icon
                                 color="green"
-                                @click="editarComprovanteNFe(props.item)"
+                                @click="openModalNFe(props.item)"
                             >
                                 <v-icon>edit</v-icon>
                             </v-btn>
@@ -173,6 +174,7 @@ export default {
             listarComprovantes: 'avaliacaoResultados/listarComprovantes',
             excluirComprovante: 'avaliacaoResultados/excluirComprovante',
             carregarDadosComprovante: 'avaliacaoResultados/carregarDadosComprovante',
+            openNFeModalAction: 'avaliacaoResultados/openNFeModalAction',
         }),
         visualizarComprovante(dadosComprovante) {
             // 1. Carregar dados do comprovante
@@ -216,11 +218,9 @@ export default {
             }
             return data;
         },
-        editarComprovanteNFe(dadosComprovante) {
-            // 1. Carregar dados do comprovante
+        openModalNFe(dadosComprovante) {
             this.carregarDadosComprovante(dadosComprovante);
-            // 2. Emitir evento para iniciar edição
-            //this.$root.$emit('editar-comprovante');
+            this.openNFeModalAction({ open: true, type: 'edit' });
         },
     },
 };
