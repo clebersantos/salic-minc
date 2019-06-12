@@ -25,20 +25,20 @@
         />
         <NFe
             v-bind="{
-            uf:{ id: uf, value: uf},
-            produto:{ id: produto, value: produto.produto},
-            cidade:{ id: cidade.cdCidade, value: cidade.cidade},
-            etapa: { id: etapa, value: dadosItem.Etapa },
-            idPlanilhaAprovacao: idPlanilhaAprovacao,
-            idPlanilhaItens: idPlanilhaItens,
-            item: {
-                id: idPlanilhaItens,
-                value: dadosItem.Etapa,
-                varlorAprovado: dadosProjeto.varlorAprovado,
-                varlorComprovado: dadosProjeto.varlorComprovado,
-                varlorAprovado: dadosProjeto.varlorAprovado
-            },
-            projeto:{ idpronac: idPronac, nome: dadosProjeto.nomeProjeto }
+                uf:{ id: uf, value: uf},
+                produto:{ id: produto, value: produto.produto},
+                cidade:{ id: cidade.cdCidade, value: cidade.cidade},
+                etapa: { id: etapa, value: dadosItem.Etapa },
+                idPlanilhaAprovacao: idPlanilhaAprovacao,
+                idPlanilhaItens: idPlanilhaItens,
+                item: {
+                    id: idPlanilhaItens,
+                    value: dadosItem.Etapa,
+                    varlorAprovado: dadosProjeto.varlorAprovado,
+                    varlorComprovado: dadosProjeto.varlorComprovado,
+                    varlorAprovado: dadosProjeto.varlorAprovado
+                },
+                projeto:{ idpronac: idPronac, nome: dadosProjeto.NomeProjeto }
             }"
         />
         <v-card class="mt-3">
