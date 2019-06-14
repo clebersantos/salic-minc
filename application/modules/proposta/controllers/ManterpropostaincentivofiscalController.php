@@ -94,15 +94,15 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
 
         $post = Zend_Registry::get('post');
 
-        if ($post->mecanismo == 1) { //mecanismo == 1 (proposta por incentivo fiscal)
-            $url = $this->_urlPadrao . "/proposta/manterpropostaincentivofiscal/identificacaodaproposta";
-        } else {
-            $url = $this->_urlPadrao . "/manterpropostaedital/editalconfirmar";
-        }
+        $urlAction = $this->_urlPadrao . "/proposta/manterpropostaincentivofiscal/identificacaodaproposta";
 
         //METODO QUE MONTA TELA DO USUARIO ENVIANDO TODOS OS PARAMENTROS NECESSARIO DENTRO DO ARRAY
-        $this->montaTela("manterpropostaincentivofiscal/declaracaonovaproposta.phtml", array("acao" => $url,
-            "agente" => $post->proponente));
+        $this->montaTela("manterpropostaincentivofiscal/declaracaonovaproposta.phtml",
+            array(
+                "acao" => $urlAction,
+                "agente" => $post->proponente,
+                "idMecanismo" => $post->idMecanismo
+            ));
     }
 
     /**
@@ -230,7 +230,7 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
         $dados = array(
             "idagente" => isset($post['idagente']) ? $post['idagente'] : '',
             "nomeprojeto" => isset($post['nomeprojeto']) ? $post['nomeprojeto'] : '',
-            "mecanismo" => 1, //seguindo sistema legado
+            "mecanismo" => isset($post['mecanismo']) ? $post['mecanismo'] : '',
             "agenciabancaria" => isset($post['agenciabancaria']) ? $post['agenciabancaria'] : '',
             "areaabrangencia" => isset($post['areaabrangencia']) ? $post['areaabrangencia'] : '',
             "dtiniciodeexecucao" => isset($post['dtiniciodeexecucao']) ? $post['dtiniciodeexecucao'] : '',
@@ -333,7 +333,11 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
             }
             return;
         } catch (Zend_Exception $ex) {
-            parent::message("N&atilde;o foi poss&iacute;vel realizar a opera&ccedil;&atilde;o!" . $ex->getMessage(), "/proposta/manterpropostaincentivofiscal/index?idPreProjeto=" . $idPreProjeto, "ERROR");
+            parent::message(
+                "N&atilde;o foi poss&iacute;vel realizar a opera&ccedil;&atilde;o!" . $ex->getMessage(),
+                "/proposta/manterpropostaincentivofiscal/index?idPreProjeto=" . $idPreProjeto,
+                "ERROR"
+            );
         }
     }
 
@@ -389,12 +393,18 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
         }
 
         if (empty($this->_proposta["idpreprojeto"])) {
-            $post = Zend_Registry::get('post');
 
+            $post = Zend_Registry::get('post');
             $arrBusca = array();
             if (empty($post->idAgente)) {
-                parent::message("N&atilde;o foi poss&iacute;vel realizar a opera&ccedil;&atilde;o!", "/proposta/manterpropostaincentivofiscal/listarproposta", "ERROR");
+                parent::message(
+                    "N&atilde;o foi poss&iacute;vel realizar a opera&ccedil;&atilde;o!",
+                    "/proposta/manterpropostaincentivofiscal/listarproposta",
+                    "ERROR"
+                );
             }
+            $idMecanismo = $post->idMecanismo;
+            $this->view->isEditavel = true;
 
             $arrBusca['a.idagente = ?'] = $post->idAgente;
             $tblAgente = new Agente_Model_DbTable_Agentes();
@@ -403,11 +413,15 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
                 $rsProponente = array_change_key_case($rsProponente->toArray());
 
                 $this->view->proponente = $rsProponente;
-
                 $this->view->isEditavel = true;
-
-                $this->montaTela("manterpropostaincentivofiscal/identificacaodaproposta.phtml", array("proponente" => $rsProponente,
-                    "acao" => $this->_urlPadrao . "/proposta/manterpropostaincentivofiscal/salvar"));
+                $this->view->acao = $this->_urlPadrao . "/proposta/manterpropostaincentivofiscal/salvar";
+//                $this->montaTela("manterpropostaincentivofiscal/identificacaodaproposta.phtml",
+//                    [
+//                        "proponente" => $rsProponente,
+//                        "idMecanismo" => $idMecanismo,
+//                        "acao" => $this->_urlPadrao . "/proposta/manterpropostaincentivofiscal/salvar"
+//                    ]
+//                );
             }
         } else {
             $tbl = new Proposta_Model_DbTable_TbDocumentosPreProjeto();
@@ -418,19 +432,29 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
             } elseif ($this->_proposta["stproposta"] == '619') { // proposta execucao imediata contrato de patrocínio
                 $idDocumento = 162;
             }
-            if (!empty($idDocumento)) {
-                $arquivoExecucaoImediata = $tbl->buscarDocumentos(array("idprojeto = ?" => $this->idPreProjeto, "CodigoDocumento = ?" => $idDocumento));
-            }
 
+            if (!empty($idDocumento)) {
+                $arquivoExecucaoImediata = $tbl->buscarDocumentos(
+                    array(
+                        "idprojeto = ?" => $this->idPreProjeto,
+                        "CodigoDocumento = ?" => $idDocumento
+                    )
+                );
+            }
+            $idMecanismo = $this->_proposta['mecanismo'];
             $this->view->arquivoExecucaoImediata = $arquivoExecucaoImediata;
         }
+
+        $tbMecanismo = new Mecanismo();
+        $this->view->mecanismo = $tbMecanismo->findBy(['Codigo = ?' => $idMecanismo]);
+        $this->view->idMecanismo = $idMecanismo;
 
         if ($this->isEditarProjeto($this->idPreProjeto)) {
             $tblProjetos = new Projetos();
             $projeto = $tblProjetos->findBy(array('idprojeto = ?' => $this->idPreProjeto));
 
             if (!empty($projeto['IdPRONAC'])) {
-                $projeto2 = ConsultarDadosProjetoDAO::obterDadosProjeto(array('idPronac' => (int)$projeto['IdPRONAC']));
+                $projeto2 = ConsultarDadosProjetoDAO::obterDadosProjeto(array('idPronac' => $projeto['IdPRONAC']));
 
                 $this->view->projeto = array_change_key_case((array)$projeto2[0]);
             }
@@ -838,6 +862,9 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
             $i++;
         }
 
+        $tbMecanismo = new Mecanismo();
+        $this->view->mecanismos = $tbMecanismo->buscar(['status = ?' => 1]);
+
         $this->view->dadosCombo = $dadosCombo;
         $this->view->idResponsavel = $this->idResponsavel;
         $this->view->idUsuario = $this->idUsuario;
@@ -847,6 +874,7 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
     public function listarPropostasAjaxAction()
     {
         $idAgente = $this->getRequest()->getParam('idagente');
+        $idMecanismo = $this->getRequest()->getParam('idMecanismo');
         $start = $this->getRequest()->getParam('start');
         $length = $this->getRequest()->getParam('length');
         $draw = (int)$this->getRequest()->getParam('draw');
@@ -866,9 +894,13 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
                 'recordsFiltered' => 0));
         }
 
+        $where = [
+            'a.Mecanismo = ?' => $idMecanismo
+        ];
+
         $tblPreProjeto = new Proposta_Model_DbTable_PreProjeto();
 
-        $rsPreProjeto = $tblPreProjeto->propostas($this->idResponsavel, $idAgente, array(), $order, $start, $length, $search);
+        $rsPreProjeto = $tblPreProjeto->obterPropostas($this->idResponsavel, $idAgente, $where, [], $order, $start, $length, $search);
 
         $Movimentacao = new Proposta_Model_DbTable_TbMovimentacao();
 
@@ -885,8 +917,8 @@ class Proposta_ManterpropostaincentivofiscalController extends Proposta_GenericC
 
                 $aux[$key] = $proposta;
             }
-            $recordsFiltered = $tblPreProjeto->propostasTotal($this->idResponsavel, $idAgente, array(), null, null, null, $search);
-            $recordsTotal = $tblPreProjeto->propostasTotal($this->idResponsavel, $idAgente);
+            $recordsFiltered = $tblPreProjeto->obterPropostasTotal($this->idResponsavel, $idAgente, $where, [], null, null, null, $search);
+            $recordsTotal = $tblPreProjeto->obterPropostasTotal($this->idResponsavel, $idAgente);
         }
 
         $this->_helper->json(array(

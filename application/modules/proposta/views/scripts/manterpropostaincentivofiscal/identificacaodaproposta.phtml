@@ -78,15 +78,15 @@ if (isset($this->proposta['idpreprojeto'])) {
                     <form action="<?php echo $this->acao; ?>" method="post" id="frmProposta" name="frmProposta"
                           enctype="multipart/form-data">
                         <input type="hidden" name="idPreProjeto" id="idPreProjeto"
-                               value="<?php echo isset($this->proposta['idpreprojeto']) ? $this->proposta['idpreprojeto'] : '' ?>">
-                        <input type="hidden" name="acao" id="acao" value="alterar">
-
+                               value="<?= isset($this->proposta['idpreprojeto']) ? $this->proposta['idpreprojeto'] : '' ?>">
                         <input type="hidden" name="acao" id="acao"
-                               value="<?php echo isset($this->proposta['idpreprojeto']) ? 'alterar' : 'incluir' ?>">
+                               value="<?= isset($this->proposta['idpreprojeto']) ? 'alterar' : 'incluir' ?>">
                         <input type="hidden" name="idagente"
-                               value="<?php echo isset($this->proponente['idagente']) ? $this->proponente['idagente'] : '' ?>">
+                               value="<?= isset($this->proponente['idagente']) ? $this->proponente['idagente'] : '' ?>">
                         <input type="hidden" name="url"
-                               value="<?php echo isset($this->url) ? $this->url : '' ?>">
+                               value="<?= isset($this->url) ? $this->url : '' ?>">
+                        <input type="hidden" name="mecanismo"
+                               value="<?= isset($this->proposta['mecanismo']) ? $this->proposta['mecanismo'] : $this->idMecanismo; ?>">
 
                         <div id="identificacaodiv" class="divChave">
 
@@ -96,24 +96,23 @@ if (isset($this->proposta['idpreprojeto'])) {
 
                                 <table class="tabela" cellpadding="1" cellspacing="1">
                                     <tr class="destacar centro">
-                                        <td colspan="5"><b>Identifica&ccedil;&atilde;o da Proposta Cultural</b></td>
+                                        <td colspan="5"><b>Identifica&ccedil;&atilde;o da Proposta</b></td>
                                     </tr>
 
                                     <tr class="esquerda">
+                                        <?php if (isset($this->proposta['idpreprojeto'])) :?>
                                         <td>
-                                            Nr da Proposta:<br/>
-                                            <span style="color: blue;">
-                                                            <?php
-                                                            if (isset($this->proposta['idpreprojeto']))
-                                                                echo $this->proposta['idpreprojeto'];
-                                                            ?>
-                                                        </span>
+                                                Nr da Proposta:<br/>
+                                                <span style="color: blue;">
+                                                    <?= $this->proposta['idpreprojeto']; ?>
+                                                </span>
                                         </td>
-                                        <td colspan="4">
-                                            Nome da Proposta Cultural *
+                                        <?php endif; ?>
+                                        <td colspan="<?= isset($this->proposta['idpreprojeto']) ? 4 : 5 ?>">
+                                            Nome da Proposta *
                                             <br/>
                                             <input type="text" class="input_simples" name="nomeProjeto" id="nomeProjeto"
-                                                   maxlength="500" title="Nome da Proposta Cultural" style="width:50em;"
+                                                   maxlength="500" title="Nome da Proposta" style="width:50em;"
                                                    value="<?php
                                                    if (isset($this->proposta['idpreprojeto']))
                                                        echo str_replace("'", "", str_replace("\"", "", ($this->proposta['nomeprojeto'])));
@@ -131,11 +130,16 @@ if (isset($this->proposta['idpreprojeto'])) {
                                             </div>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td class="esquerda" colspan="5">
+                                            Mecanismo: <b><?= $this->mecanismo['Descricao']; ?></b>
+                                        </td>
+                                    </tr>
                                 </table>
                                 <?php echo $this->partial("/manterpropostaincentivofiscal/partials/tipicidades.phtml", $this); ?>
                                 <table class="tabela" cellpadding="1" cellspacing="1">
                                     <tr class="destacar centro">
-                                        <td colspan="5"><b>Resumo da Proposta Cultural</b></td>
+                                        <td colspan="5"><b>Resumo da Proposta</b></td>
                                     </tr>
                                     <tr>
                                         <td colspan="5">
@@ -155,13 +159,13 @@ if (isset($this->proposta['idpreprojeto'])) {
                                         </td>
                                     </tr>
                                 </table>
+
                                 <table class="tabela" cellpadding="1" cellspacing="1">
                                     <tr class="destacar centro">
                                         <td colspan="5"><b>Informa&ccedil;&otilde;es Complementares</b></td>
                                     </tr>
                                     <tr>
-                                        <td class="centro" width="150px;" nowrap>Mecanismo: <b>Incentivo Fiscal</b></td>
-                                        <td class="">
+                                        <td colspan="2">
                                             <label for="stDataFixa">Data Fixa</label>
                                             <select class="select_simples" name="stDataFixa" id="stDataFixa"
                                                     style="width: 5em">
@@ -189,25 +193,27 @@ if (isset($this->proposta['idpreprojeto'])) {
                                                    value="<?php echo $this->proposta['agenciabancaria']; ?>"/>
                                             <div id="ValidaAgencia" name="ValidaAgencia" style="color:#FF0000"></div>
                                         </td>
-                                        <td colspan="2" class="">
-                                            <label for="areaabrangencia">&Eacute; proposta de audiovisual? </label>
-                                            <select class="select_simples" name="areaabrangencia" id="areaabrangencia"
-                                                    style="width: 5em">
-                                                <option value="0" <?php
-                                                if (isset($this->proposta['idpreprojeto']))
-                                                    if ($this->proposta['areaabrangencia'] == "0") {
-                                                        echo "selected";
-                                                    }
-                                                ?>>N&atilde;o
-                                                </option>
-                                                <option value="1" <?php
-                                                if (isset($this->proposta['idpreprojeto']))
-                                                    if ($this->proposta['areaabrangencia'] == "1") {
-                                                        echo "selected";
-                                                    }
-                                                ?>>Sim
-                                                </option>
-                                            </select>
+                                        <td colspan="2" class="centro">
+                                            <?php if ($this->proposta['mecanismo'] == '1') : ?>
+                                                <label for="areaabrangencia">&Eacute; proposta de audiovisual? </label>
+                                                <select class="select_simples" name="areaabrangencia" id="areaabrangencia"
+                                                        style="width: 5em">
+                                                    <option value="0" <?php
+                                                    if (isset($this->proposta['idpreprojeto']))
+                                                        if ($this->proposta['areaabrangencia'] == "0") {
+                                                            echo "selected";
+                                                        }
+                                                    ?>>N&atilde;o
+                                                    </option>
+                                                    <option value="1" <?php
+                                                    if (isset($this->proposta['idpreprojeto']))
+                                                        if ($this->proposta['areaabrangencia'] == "1") {
+                                                            echo "selected";
+                                                        }
+                                                    ?>>Sim
+                                                    </option>
+                                                </select>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                     <tr>
@@ -379,8 +385,8 @@ if (isset($this->proposta['idpreprojeto'])) {
 
                                         <textarea id="objetivos" class="browser-default editor"
                                                   name="objetivos" <?php echo isset($this->arrConfig['objetivos']['disabled']) ? 'disabled="disabled"' : '' ?>>
-                                                     <?php if (isset($this->proposta['objetivos'])) echo $this->proposta['objetivos']; ?>
-                                                    </textarea>
+                                                         <?php if (isset($this->proposta['objetivos'])) echo $this->proposta['objetivos']; ?>
+                                                        </textarea>
                                         <!--  <label for="objetivos" class="active">Objetivos *</label>-->
                                     </td>
                                 </tr>
@@ -405,13 +411,12 @@ if (isset($this->proposta['idpreprojeto'])) {
 
                                         <textarea id="justificativa" class="browser-default editor"
                                                   name="justificativa" <?php echo isset($this->arrConfig['justificativa']['disabled']) ? 'disabled="disabled"' : '' ?>>
-                                                 <?php if (isset($this->proposta['justificativa'])) echo $this->proposta['justificativa']; ?>
-                                                </textarea>
+                                                     <?php if (isset($this->proposta['justificativa'])) echo $this->proposta['justificativa']; ?>
+                                                    </textarea>
                                         <!--                                <label for="justificativa" class="active">Justificativa *</label>-->
                                     </td>
                                 </tr>
                             </table>
-
                         </div>
 
                         <?php if ($this->isEditavel || empty($this->idPreProjeto)) : ?>
@@ -490,12 +495,12 @@ if (isset($this->proposta['idpreprojeto'])) {
 
         $("#frmProposta").validate({
             rules: {
-                nomeProjeto: { required: true },
+                nomeProjeto: {required: true},
 //                resumoDoProjeto: {validarResumoDoProjeto: true, validarResumoDoProjeto1000: true},
-                agenciaBancaria: { required: true },
-                dtInicioDeExecucao: { required: true, minlength: 10 },
-                dtFinalDeExecucao: { required: true, minlength: 10 },
-                stProposta: { required: true }
+                agenciaBancaria: {required: true},
+                dtInicioDeExecucao: {required: true, minlength: 10},
+                dtFinalDeExecucao: {required: true, minlength: 10},
+                stProposta: {required: true}
             },
             messages: {
                 nomeProjeto: {

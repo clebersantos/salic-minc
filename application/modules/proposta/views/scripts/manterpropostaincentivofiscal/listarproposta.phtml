@@ -12,10 +12,13 @@
                 <div class="row">
                     <div class="col s12 m12 l2">
                         <b>Mecanismo:</b></br>
-                        <select name="mecanismo" id="mecanismo" class="browser-default">
-                            <option value="1" <?php echo ($this->mecanismo == 1) ? 'selected="selected"' : ''; ?>>
-                                Incentivo Fiscal Federal
-                            </option>
+                        <select name="idMecanismo" id="idMecanismo" class="browser-default">
+                            <?php foreach ($this->mecanismos as $mecanismo) : ?>
+                                <option
+                                    class="proponente"
+                                    value="<?= $mecanismo['Codigo'] ?>"
+                                ><?= $mecanismo['Descricao'] ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="col s12 m12 l5">
@@ -105,16 +108,17 @@
 
         $("#frmNovaProposta").validate({
             rules: {
-                mecanismo: {required: true},
+                idMecanismo: {required: true},
                 proponente: {required: true}
             },
             messages: {
-                mecanismo: {required: " Obrigat&oacute;rio"},
+                idMecanismo: {required: " Obrigat&oacute;rio"},
                 proponente: {required: " Informe o nome de um Proponente"}
             },
             submitHandler: function (form) {
                 //form.submit();
                 $("#msgValidaProponente").html("");
+                $("#propostasCadastradas").html("");
                 var nomeProponente = $('#proponente option:selected').val();
 
                 if (nomeProponente == "") {
@@ -150,6 +154,9 @@
                     data: {
                         "idagente": function (d) {
                             return $('#proponente').val();
+                        },
+                        "idMecanismo": function (d) {
+                            return $('#idMecanismo').val();
                         }
                     },
                     type: "POST"
@@ -212,7 +219,15 @@
 
             $3('.tooltipped').tooltip({delay: 50});
 
-            $("#proponente").change(function () {
+            $("#proponente, #idMecanismo").change(function () {
+                let idMecanismo = parseInt($("#mecanismo").val());
+
+                var column = table.column(3);
+                column.visible(true);
+                if (idMecanismo != 1) {
+                    column.visible(false);
+                }
+
                 table.ajax.reload();
             });
 
