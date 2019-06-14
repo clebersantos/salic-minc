@@ -73,8 +73,9 @@
 
 <script>
 import _ from 'lodash';
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import { utils } from '@/mixins/utils';
+import Const from '../const';
 import validarFormulario from '../mixins/validarFormulario';
 import verificarPerfil from '../mixins/verificarPerfil';
 
@@ -126,6 +127,9 @@ export default {
         };
     },
     computed: {
+        ...mapGetters({
+            campoAtual: 'readequacao/getCampoAtual',
+        }),
         perfilAceito() {
             return this.verificarPerfil(this.perfil, this.perfisAceitos);
         },
@@ -148,6 +152,7 @@ export default {
     },
     methods: {
         ...mapActions({
+            obterCampoAtual: 'readequacao/obterCampoAtual',
             updateReadequacao: 'readequacao/updateReadequacao',
             finalizarReadequacao: 'readequacao/finalizarReadequacao',
         }),
@@ -160,11 +165,28 @@ export default {
                             solicitacao: this.dadosReadequacao.dsSolicitacao.length,
                             justificativa: this.dadosReadequacao.dsJustificativa.length,
                         };
-                        this.validacao = this.validarFormulario(
-                            this.dadosReadequacao,
-                            contador,
-                            this.minChar,
-                        );
+                        if (this.dadosReadequacao.idTipoReadequacao === Const.TIPO_READEQUACAO_PERIODO_EXECUCAO) {
+                            const key = `key_${this.dadosReadequacao.idTipoReadequacao}`;
+                            if (typeof this.campoAtual[key] === 'undefined') {
+                                this.obterCampoAtual({
+                                    idPronac: this.dadosReadequacao.idPronac,
+                                    idTipoReadequacao: this.dadosReadequacao.idTipoReadequacao,
+                                }).then(() => {
+                                    this.validacao = this.validarFormulario(
+                                        this.dadosReadequacao,
+                                        contador,
+                                        this.minChar,
+                                        this.campoAtual[`key_${this.dadosReadequacao.idTipoReadequacao}`].dsCampo,
+                                    );
+                                });
+                            }
+                        } else {
+                            this.validacao = this.validarFormulario(
+                                this.dadosReadequacao,
+                                contador,
+                                this.minChar,
+                            );
+                        }
                     }
                 }
             }
