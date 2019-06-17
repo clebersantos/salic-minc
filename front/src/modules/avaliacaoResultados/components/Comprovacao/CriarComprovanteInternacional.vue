@@ -94,12 +94,12 @@
                                     label="TIPO DE DOCUMENTO"
                                 >
                                     <v-radio
-                                        :value="1"
+                                        :value="6"
                                         label="Invoice"
                                         color="teal"
                                     />
                                     <v-radio
-                                        :value="2"
+                                        :value="7"
                                         label="Outros"
                                         color="teal"
                                     />
@@ -352,7 +352,7 @@ export default {
             enderecoRules: [
                 endereco => !!endereco || 'O campo endereço é obrigatório!',
             ],
-            tipoDocumento: 1,
+            tipoDocumento: 6,
             numero: '',
             numeroRules: [
                 numero => !!numero || 'O campo número é obrigatório!',
@@ -487,38 +487,36 @@ export default {
             this.preencherInputs();
             this.dialog = true;
         },
-        /**
         preencherInputs() {
             const dados = this.dadosComprovante;
-            this.cpfCnpjLabel = dados.CNPJCPF.length > 11 ? 'CNPJ' : 'CPF';
-            this.cpfCnpj = dados.CNPJCPF;
-            this.tipoComprovante = parseInt(dados.tipo, 10);
-            this.dataDocumento = dados.dataDocumento.slice(0, 10);
+            // Encontrar código do país
+            const paisObj = this.paises.find(pais => pais.nome === dados.fornecedor.nacionalidade);
+            this.pais = paisObj.id;
+
+            this.nomeEmpresa = dados.nmFornecedor;
+            this.endereco = dados.endereco;
+            this.tipoDocumento = parseInt(dados.tipo, 10);
             this.numero = dados.numero;
             this.serie = dados.serie;
-            this.nomeArquivo = dados.nmArquivo;
-            this.formaPagamento = parseInt(dados.forma, 10);
+            this.dataDocumento = dados.dataEmissao.slice(0, 10);
             this.dataPagamento = dados.dataPagamento.slice(0, 10);
-            this.numeroDocumentoPagamento = dados.numeroDocumento;
             document.getElementById('valor').value = Number.parseFloat(dados.valor).toFixed(2);
+            this.nomeArquivo = dados.nmArquivo;
             this.justificativa = dados.justificativa;
         },
         submit() {
-            this.buscarFornecedor(this.cpfCnpj);
             this.$refs.form.validate();
 
-            if (this.valid && this.agenteEhCadastrado) {
+            if (this.valid) {
                 const formData = new FormData();
 
                 const comprovante = {
                     fornecedor: {
-                        nacionalidade: 31,
-                        tipoPessoa: this.cpfCnpjLabel === 'CPF' ? 1 : 2,
-                        CNPJCPF: this.cpfCnpj.replace(/[/.-]/g, ''),
-                        cnpjcpfMask: this.cpfCnpj,
-                        nome: this.nomeRazaoSocial,
-                        idAgente: this.agente[0].idAgente,
-                        eInternacional: false,
+                        nacionalidade: this.paises[this.pais - 1].nome,
+                        tipoPessoa: 1,
+                        nome: this.nomeEmpresa,
+                        eInternacional: true,
+                        endereco: this.endereco,
                     },
                     arquivo: {
                         nome: this.nomeArquivo,
@@ -526,24 +524,24 @@ export default {
                     },
                     item: this.idPlanilhaItens,
                     idPlanilhaAprovacao: this.idPlanilhaAprovacao,
-                    tipo: this.tipoComprovante,
+                    tipo: this.tipoDocumento,
                     numero: this.numero,
                     serie: this.serie,
-                    dataDocumento: this.dataDocumentoFormatada,
+                    dataEmissao: this.dataDocumentoFormatada,
                     dataPagamento: this.dataPagamentoFormatada,
-                    forma: this.formaPagamento,
-                    numeroDocumento: this.numeroDocumentoPagamento,
+                    forma: 1,
                     valor: this.valorNumber(this.valor),
-                    valorAntigo: this.dadosComprovante.valor,
-                    valorPermitido: this.valorNumber(this.valorComprovar),
+                    valorAntigo: 0,
                     justificativa: this.justificativa,
                     foiAtualizado: this.foiAtualizado,
                 };
 
                 if (this.modoEdicao) {
+                    comprovante.fornecedor.id = this.dadosComprovante.fornecedor.id;
                     comprovante['_index'] = parseInt(this.dadosComprovante.idComprovantePagamento, 10);
                     comprovante.id = parseInt(this.dadosComprovante.idComprovantePagamento, 10);
                     comprovante.idComprovantePagamento = parseInt(this.dadosComprovante.idComprovantePagamento, 10);
+                    comprovante.valorAntigo = this.dadosComprovante.valor;
                 }
 
                 const comprovanteJSON = JSON.stringify(comprovante);
@@ -558,28 +556,25 @@ export default {
             }
         },
         reset(resetValidation) {
-            this.cpfCnpjLabel = 'CNPJ';
-            this.cpfCnpj = '';
-            this.tipoComprovante = 1;
-            this.dataDocumento = '';
+            this.pais = 1;
+            this.nomeEmpresa = '';
+            this.endereco = '';
+            this.tipoDocumento = 6;
             this.numero = '';
             this.serie = '';
+            this.dataDocumento = '';
+            this.dataPagamento = '';
+            document.getElementById('valor').value = 0;
+            this.valor = 'R$ 0,00';
             this.nomeArquivo = '';
             this.arquivo = '';
             this.$refs.inputComprovante.value = '';
             this.foiAtualizado = false;
-            this.formaPagamento = 1;
-            this.dataPagamento = '';
-            this.numeroDocumentoPagamento = '';
-            document.getElementById('valor').value = 0;
-            this.valor = 'R$ 0,00';
             this.justificativa = '';
-            this.limparAgente();
             this.modoEdicao = false;
             this.modoVisualizacao = false;
             resetValidation();
         },
-         */
     },
 };
 </script>

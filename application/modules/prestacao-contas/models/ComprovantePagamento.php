@@ -77,7 +77,7 @@ final class PrestacaoContas_Model_ComprovantePagamento extends MinC_Db_Table_Abs
     {
         $this->fornecedor['nome'] = $obj->fornecedor->nome;
         $this->fornecedor['endereco'] = $obj->fornecedor->endereco;
-        $this->fornecedor['pais'] = $obj->fornecedor->nacionalidade;
+        $this->fornecedor['pais'] = utf8_decode($obj->fornecedor->nacionalidade);
 
         if($obj->fornecedor->id) {
             $this->fornecedor['id'] = $obj->fornecedor->id;

@@ -683,7 +683,7 @@ export default {
                     forma: this.formaPagamento,
                     numeroDocumento: this.numeroDocumentoPagamento,
                     valor: this.valorNumber(this.valor),
-                    valorAntigo: this.dadosComprovante.valor,
+                    valorAntigo: 0,
                     valorPermitido: this.valorNumber(this.valorComprovar),
                     justificativa: this.justificativa,
                     foiAtualizado: this.foiAtualizado,
@@ -693,6 +693,7 @@ export default {
                     comprovante['_index'] = parseInt(this.dadosComprovante.idComprovantePagamento, 10);
                     comprovante.id = parseInt(this.dadosComprovante.idComprovantePagamento, 10);
                     comprovante.idComprovantePagamento = parseInt(this.dadosComprovante.idComprovantePagamento, 10);
+                    comprovante.valorAntigo = this.dadosComprovante.valor;
                 }
 
                 const comprovanteJSON = JSON.stringify(comprovante);
