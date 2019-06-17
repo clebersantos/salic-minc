@@ -3,24 +3,6 @@
         v-model="dialog"
         scrollable
     >
-        <v-tooltip
-            slot="activator"
-            left
-        >
-            <v-btn
-                slot="activator"
-                color="teal"
-                dark
-                fixed
-                bottom
-                left
-                fab
-                @click="valid = true"
-            >
-                <v-icon>add</v-icon>
-            </v-btn>
-            <span>Criar Comprovante</span>
-        </v-tooltip>
         <v-card>
             <v-toolbar
                 dark
@@ -70,6 +52,7 @@
                                 md6
                             >
                                 <v-text-field
+                                    :readonly="modoVisualizacao"
                                     v-model="nomeEmpresa"
                                     label="NOME DA EMPRESA *"
                                     outline
@@ -80,16 +63,17 @@
                                 md6
                             >
                                 <v-text-field
+                                    :readonly="modoVisualizacao"
                                     v-model="endereco"
                                     label="ENDEREÇO *"
                                     outline
                                 />
                             </v-flex>
                             <v-flex
-                                v-if="!modoVisualizacao"
                                 xs12
                             >
                                 <v-radio-group
+                                    :readonly="modoVisualizacao"
                                     v-model="tipoDocumento"
                                     label="TIPO DE DOCUMENTO"
                                 >
@@ -328,6 +312,7 @@ import { setTimeout } from 'timers';
 export default {
     directives: { money: VMoney },
     props: {
+        activator: { type: Boolean, default: false },
         idPlanilhaItens: { type: String, default: '' },
         idPlanilhaAprovacao: { type: String, default: '' },
         dataInicioFormatada: { type: String, default: '' },
@@ -411,6 +396,9 @@ export default {
         },
     },
     watch: {
+        activator() {
+            this.dialog = true;
+        },
         dataDocumentoPicker(val) {
             if (val) {
                 setTimeout(() => {
@@ -571,6 +559,7 @@ export default {
             this.$refs.inputComprovante.value = '';
             this.foiAtualizado = false;
             this.justificativa = '';
+            this.valid = true;
             this.modoEdicao = false;
             this.modoVisualizacao = false;
             resetValidation();

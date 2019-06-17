@@ -1,8 +1,85 @@
 <template>
     <v-container fluid>
-        <!-- Criar Comprovante -->
+        <v-speed-dial
+            v-model="fab"
+            bottom
+            right
+            direction="top"
+            open-on-hover
+            transition="slide-y-reverse-transition"
+            fixed
+        >
+            <v-tooltip
+                slot="activator"
+                left
+            >
+                <v-btn
+                    slot="activator"
+                    v-model="fab"
+                    color="teal"
+                    dark
+                    fab
+                >
+                    <v-icon>add</v-icon>
+                    <v-icon>close</v-icon>
+                </v-btn>
+                <span>Criar Comprovante</span>
+            </v-tooltip>
+
+            <!-- NFe -->
+            <v-tooltip
+                left
+            >
+                <v-btn
+                    slot="activator"
+                    fab
+                    dark
+                    small
+                    color="red"
+                >
+                    <v-icon>add</v-icon>
+                </v-btn>
+                <span>NFe</span>
+            </v-tooltip>
+
+            <!-- Criar Comprovante Internacional -->
+            <v-tooltip
+                left
+            >
+                <v-btn
+                    slot="activator"
+                    color="blue"
+                    dark
+                    fab
+                    small
+                    @click="comprovanteInternacionalDialog = !comprovanteInternacionalDialog"
+                >
+                    <v-icon>public</v-icon>
+                </v-btn>
+                <span>Criar Comprovante Internacional</span>
+            </v-tooltip>
+
+            <!-- Criar Comprovante Nacional -->
+            <v-tooltip
+                left
+            >
+                <v-btn
+                    slot="activator"
+                    fab
+                    dark
+                    small
+                    color="success"
+                    @click="comprovanteNacionalDialog = !comprovanteNacionalDialog"
+                >
+                    <strong>R$</strong>
+                </v-btn>
+                <span>Criar Comprovante Nacional</span>
+            </v-tooltip>
+        </v-speed-dial>
+
         <criar-comprovante-nacional
             v-if="dadosProjeto.dtInicioExecucao"
+            :activator="comprovanteNacionalDialog"
             :id-planilha-itens="String(idPlanilhaItens)"
             :id-planilha-aprovacao="String(idPlanilhaAprovacao)"
             :data-inicio-formatada="dadosProjeto.dtInicioExecucao | dataFilter"
@@ -13,6 +90,7 @@
         />
         <criar-comprovante-internacional
             v-if="dadosProjeto.dtInicioExecucao"
+            :activator="comprovanteInternacionalDialog"
             :id-planilha-itens="String(idPlanilhaItens)"
             :id-planilha-aprovacao="String(idPlanilhaAprovacao)"
             :data-inicio-formatada="dadosProjeto.dtInicioExecucao | dataFilter"
@@ -21,6 +99,7 @@
             :data-fim="dadosProjeto.dtFimExecucao"
             :valor-comprovar="valorComprovar | moedaFilter"
         />
+
         <!-- Excluir Comprovante -->
         <excluir-comprovante/>
 
@@ -157,6 +236,9 @@ export default {
             snackbar: false,
             acao: '',
             mensagemFinal: {},
+            fab: false,
+            comprovanteInternacionalDialog: false,
+            comprovanteNacionalDialog: false,
         };
     },
     computed: {

@@ -3,24 +3,6 @@
         v-model="dialog"
         scrollable
     >
-        <v-tooltip
-            slot="activator"
-            left
-        >
-            <v-btn
-                slot="activator"
-                color="teal"
-                dark
-                fixed
-                bottom
-                right
-                fab
-                @click="valid = true"
-            >
-                <v-icon>add</v-icon>
-            </v-btn>
-            <span>Criar Comprovante</span>
-        </v-tooltip>
         <v-card>
             <v-toolbar
                 dark
@@ -407,6 +389,7 @@ export default {
     directives: { money: VMoney },
     mixins: [validadorCpf, validadorCnpj],
     props: {
+        activator: { type: Boolean, default: false },
         idPlanilhaItens: { type: String, default: '' },
         idPlanilhaAprovacao: { type: String, default: '' },
         dataInicioFormatada: { type: String, default: '' },
@@ -536,6 +519,9 @@ export default {
         },
     },
     watch: {
+        activator() {
+            this.dialog = true;
+        },
         dataEmissaoPicker(val) {
             if (val) {
                 setTimeout(() => {
@@ -725,6 +711,7 @@ export default {
             this.valor = 'R$ 0,00';
             this.justificativa = '';
             this.limparAgente();
+            this.valid = true;
             this.modoEdicao = false;
             this.modoVisualizacao = false;
             resetValidation();
