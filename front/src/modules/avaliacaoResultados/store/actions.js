@@ -529,3 +529,7 @@ export const buscarNFeAction = ({ commit }, params) => {
             throw new TypeError(e.response.data.message, 'error', 10);
         });
 };
+
+export const openNFeModalAction = ({ commit }, params) => {
+    commit(types.SET_NFE_MODAL, params);
+};

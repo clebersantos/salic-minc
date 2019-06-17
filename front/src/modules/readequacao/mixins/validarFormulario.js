@@ -17,12 +17,13 @@ export default {
             ) {
                 if (typeof readequacao.idTipoReadequacao !== 'undefined') {
                     if (readequacao.idTipoReadequacao === Const.TIPO_READEQUACAO_PERIODO_EXECUCAO) {
+                        let campoLocal = campo;
                         if (campo.includes('/')) {
                             const [day, month, year] = campo.split('/');
-                            campo = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                            campoLocal = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
                         }
-                        if (campo !== ''
-                            && readequacao.dsSolicitacao.trim() !== campo) {
+                        if (campoLocal !== ''
+                            && readequacao.dsSolicitacao.trim() !== campoLocal) {
                             if (contador.solicitacao >= minChar.dataExecucao) {
                                 valido.solicitacao = true;
                             }

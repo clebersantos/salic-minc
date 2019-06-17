@@ -11,7 +11,9 @@
             @click.stop="abrirEdicao()"
         >
             <v-tooltip bottom>
-                <v-icon slot="activator">edit</v-icon>
+                <v-icon slot="activator">
+                    edit
+                </v-icon>
                 <span>Editar Readequação</span>
             </v-tooltip>
         </v-btn>
@@ -43,7 +45,9 @@
                         dark
                         @click="dialog = false"
                     >
-                        <v-icon>close</v-icon>
+                        <v-icon>
+                            close
+                        </v-icon>
                     </v-btn>
                     <v-toolbar-title>Readequação - {{ dadosReadequacao.dsTipoReadequacao }}</v-toolbar-title>
                     <v-spacer/>
@@ -109,6 +113,7 @@
                                 <upload-file
                                     :formatos-aceitos="formatosAceitos"
                                     :id-documento="getReadequacao.idDocumento"
+                                    :action-done="uploadActionDone"
                                     class="mt-1"
                                     @arquivo-anexado="atualizarArquivo($event)"
                                     @arquivo-removido="removerArquivo()"
@@ -135,17 +140,21 @@
                                         <v-icon
                                             right
                                             dark
-                                        >done</v-icon>
+                                        >
+                                            done
+                                        </v-icon>
                                     </v-btn>
                                     <v-btn
                                         color="red lighten-2"
                                         dark
                                         @click="dialog = false"
-                                    >Cancelar
+                                    >Fechar
                                         <v-icon
                                             right
                                             dark
-                                        >cancel</v-icon>
+                                        >
+                                            cancel
+                                        </v-icon>
                                     </v-btn>
                                     <finalizar-button
                                         :disabled="!validacao"
@@ -274,6 +283,7 @@ export default {
                 required: v => !!v || 'Campo obrigatório.',
                 dataExecucaoChars: v => (v && v.length >= this.minChar.dataExecucao) || 'Data em formato inválido',
                 dataExecucao: v => (v !== this.getValorCampoAtual()) || 'Data deve ser diferente da original.',
+                somenteNumerico: v => (v && /^[\d]*$/.test(v)) || 'Somente dados numéricos',
                 solicitacao: v => (v && v.length >= this.minChar.solicitacao) || `Deve ter no mínimo ${this.minChar.solicitacao} caracteres.`,
                 justificativa: v => (v && v.length >= this.minChar.justificativa)
                     || `Justificativa ter no mínimo ${this.minChar.justificativa} caracteres.`,
@@ -284,6 +294,7 @@ export default {
             ],
             loading: true,
             arquivo: {},
+            uploadActionDone: true,
         };
     },
     computed: {
@@ -340,7 +351,6 @@ export default {
         dadosReadequacao: {
             handler(value) {
                 if (value.idPronac && value.idTipoReadequacao) {
-                    this.obterDadosIniciais();
                     if (this.bindClick === this.dadosReadequacao.idReadequacao) {
                         this.dialog = true;
                     }
@@ -369,16 +379,19 @@ export default {
             if (
                 this.dadosReadequacao.idPronac && this.dadosReadequacao.idTipoReadequacao
             ) {
+                this.inicializarReadequacaoEditada();
                 this.obterReadequacao(this.dadosReadequacao);
-                this.obterCampoAtual({
-                    idPronac: this.dadosReadequacao.idPronac,
-                    idTipoReadequacao: this.dadosReadequacao.idTipoReadequacao,
-                }).then(() => {
-                    this.inicializarReadequacaoEditada();
-                });
+                const key = `key_${this.dadosReadequacao.idTipoReadequacao}`;
+                if (typeof this.campoAtual[key] === 'undefined') {
+                    this.obterCampoAtual({
+                        idPronac: this.dadosReadequacao.idPronac,
+                        idTipoReadequacao: this.dadosReadequacao.idTipoReadequacao,
+                    });
+                }
             }
         },
         abrirEdicao() {
+            this.inicializarReadequacaoEditada();
             this.obterCampoAtual({
                 idPronac: this.dadosReadequacao.idPronac,
                 idTipoReadequacao: this.dadosReadequacao.idTipoReadequacao,
@@ -414,16 +427,23 @@ export default {
             };
         },
         atualizarArquivo(arquivo) {
+            this.uploadActionDone = false;
             this.readequacaoEditada.documento = arquivo;
+            if (this.readequacaoEditada.idReadequacao === 0) {
+                this.readequacaoEditada.idReadequacao = this.dadosReadequacao.idReadequacao;
+                this.readequacaoEditada.idPronac = this.dadosReadequacao.idPronac;
+            }
             this.updateReadequacao(this.readequacaoEditada).then(() => {
                 this.mensagem.conteudo = 'Arquivo enviado!';
                 this.mensagem.ativa = true;
                 this.mensagem.finaliza = false;
                 this.mensagem.cor = 'green darken-1';
                 this.recarregarReadequacoes = true;
+                this.uploadActionDone = true;
             });
         },
         removerArquivo() {
+            this.uploadActionDone = false;
             this.readequacaoEditada.documento = '';
             this.readequacaoEditada.idDocumento = '';
             this.updateReadequacao(this.readequacaoEditada).then(() => {
@@ -432,6 +452,7 @@ export default {
                 this.mensagem.finaliza = false;
                 this.mensagem.cor = 'green darken-1';
                 this.recarregarReadequacoes = true;
+                this.uploadActionDone = true;
             });
         },
         atualizarCampo(valor, campo) {
@@ -447,11 +468,16 @@ export default {
         },
         validar() {
             if (typeof this.dadosReadequacao.idTipoReadequacao !== 'undefined') {
+                let campo = '';
+                const key = `key_${this.dadosReadequacao.idTipoReadequacao}`;
+                if (typeof this.campoAtual[key] !== 'undefined') {
+                    campo = this.campoAtual[key].dsCampo;
+                }
                 this.validacao = this.validarFormulario(
                     this.readequacaoEditada,
                     this.contador,
                     this.minChar,
-                    this.campoAtual[`key_${this.dadosReadequacao.idTipoReadequacao}`].dsCampo,
+                    campo,
                 );
             }
         },

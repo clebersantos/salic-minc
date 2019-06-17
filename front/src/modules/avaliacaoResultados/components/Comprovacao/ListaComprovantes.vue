@@ -33,9 +33,9 @@
                             </v-btn>
                             <span>Visualizar</span>
                         </v-tooltip>
-
                         <!-- Editar Comprovante -->
                         <v-tooltip
+                            v-if="props.item.tipo != 6"
                             top
                         >
                             <v-btn
@@ -49,6 +49,17 @@
                             </v-btn>
                             <span>Editar</span>
                         </v-tooltip>
+
+                            <v-btn
+                                v-if="props.item.tipo == 6"
+                                slot="activator"
+                                flat
+                                icon
+                                color="green"
+                                @click="openModalNFe(props.item)"
+                            >
+                                <v-icon>edit</v-icon>
+                            </v-btn>
 
                         <!-- Excluir Comprovante -->
                         <v-tooltip
@@ -146,6 +157,7 @@ export default {
                 },
             ],
             dialog: false,
+            dialogNFe: false,
         };
     },
     computed: {
@@ -162,6 +174,7 @@ export default {
             listarComprovantes: 'avaliacaoResultados/listarComprovantes',
             excluirComprovante: 'avaliacaoResultados/excluirComprovante',
             carregarDadosComprovante: 'avaliacaoResultados/carregarDadosComprovante',
+            openNFeModalAction: 'avaliacaoResultados/openNFeModalAction',
         }),
         visualizarComprovante(dadosComprovante) {
             // 1. Carregar dados do comprovante
@@ -204,6 +217,10 @@ export default {
                     data = 'N/A';
             }
             return data;
+        },
+        openModalNFe(dadosComprovante) {
+            this.carregarDadosComprovante(dadosComprovante);
+            this.openNFeModalAction({ open: true, type: 'edit' });
         },
     },
 };

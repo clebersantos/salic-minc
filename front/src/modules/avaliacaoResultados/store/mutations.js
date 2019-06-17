@@ -58,6 +58,7 @@ export const state = {
     statusComprovante: {},
     dadosComprovante: {},
     carregarPaises: [],
+    nfeModal: false,
 };
 
 export const mutations = {
@@ -283,5 +284,8 @@ export const mutations = {
     },
     [types.CARREGAR_PAISES](state, dados) {
         state.carregarPaises = dados;
+    },
+    [types.SET_NFE_MODAL](state, dados) {
+        state.nfeModal = dados;
     },
 };

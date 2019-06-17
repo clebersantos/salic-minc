@@ -130,6 +130,7 @@ export default {
     watch: {
         date() {
             this.setChangedDate(this.date);
+            this.loading = false;
         },
         campo() {
             if (this.campo.valor !== '') {
@@ -146,6 +147,12 @@ export default {
                 this.updateCampo(this.date);
             }
         },
+    },
+    created() {
+        if (typeof this.dadosReadequacao.dsSolicitacao !== 'undefined') {
+            this.setChangedDate(this.dadosReadequacao.dsSolicitacao);
+        }
+        this.loading = false;
     },
     methods: {
         setChangedDate(newDate = '') {

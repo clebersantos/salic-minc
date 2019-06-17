@@ -112,6 +112,14 @@
             :dados-item="dadosItem"
             :valor-comprovar="valorComprovar"
         />
+
+        <v-btn
+            color="primary"
+            dark
+            @click="openNFeModalAction({ open: true, type: 'new' })"
+        >
+            NFe
+        </v-btn>
         <NFe
             v-bind="{
                 uf:{ id: uf, value: uf},
@@ -127,7 +135,8 @@
                     varlorComprovado: dadosProjeto.varlorComprovado,
                     varlorAprovado: dadosProjeto.varlorAprovado
                 },
-                projeto:{ idpronac: idPronac, nome: dadosProjeto.nomeProjeto }
+                projeto:{ idpronac: idPronac, nome: dadosProjeto.NomeProjeto },
+                dialog: nfeModalGetter
             }"
         />
         <v-card class="mt-3">
@@ -232,13 +241,13 @@ export default {
             etapa: this.$route.params.etapa,
             idPlanilhaAprovacao: this.$route.params.idPlanilhaAprovacao,
             idPlanilhaItens: this.$route.params.idPlanilhaItens,
-
             snackbar: false,
             acao: '',
             mensagemFinal: {},
             fab: false,
             comprovanteInternacionalDialog: false,
             comprovanteNacionalDialog: false,
+            nfeModal: false,
         };
     },
     computed: {
@@ -246,6 +255,7 @@ export default {
             dadosProjeto: 'avaliacaoResultados/getDadosProjeto',
             dadosItem: 'avaliacaoResultados/getDadosItem',
             statusComprovante: 'avaliacaoResultados/statusComprovante',
+            nfeModalGetter: 'avaliacaoResultados/nfeModalGetter',
         }),
         dadosItemParams() {
             return {
@@ -290,7 +300,11 @@ export default {
         ...mapActions({
             setDadosProjeto: 'avaliacaoResultados/getDadosProjeto',
             setDadosItem: 'avaliacaoResultados/getDadosItem',
+            openNFeModalAction: 'avaliacaoResultados/openNFeModalAction',
         }),
+        nfeModalOpen() {
+            this.nfeModal = true;
+        },
     },
 };
 </script>
