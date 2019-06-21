@@ -180,13 +180,21 @@ export default {
             // 1. Carregar dados do comprovante
             this.carregarDadosComprovante(dadosComprovante);
             // 2. Emitir evento para iniciar visualização
-            this.$root.$emit('visualizar-comprovante');
+            if (this.tipo === 'nacional') {
+                this.$root.$emit('visualizar-comprovante-nacional');
+            } else {
+                this.$root.$emit('visualizar-comprovante-internacional');
+            }
         },
         editarComprovante(dadosComprovante) {
             // 1. Carregar dados do comprovante
             this.carregarDadosComprovante(dadosComprovante);
             // 2. Emitir evento para iniciar edição
-            this.$root.$emit('editar-comprovante');
+            if (this.tipo === 'nacional') {
+                this.$root.$emit('editar-comprovante-nacional');
+            } else {
+                this.$root.$emit('editar-comprovante-internacional');
+            }
         },
         excluirComprovante(idComprovantePagamento) {
             this.$root.$emit('excluir-comprovante', idComprovantePagamento);

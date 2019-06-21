@@ -428,8 +428,8 @@ export default {
     },
     mounted() {
         this.carregarPaises();
-        this.$root.$on('editar-comprovante', () => this.prepararEdicao());
-        this.$root.$on('visualizar-comprovante', () => this.prepararVisualizacao());
+        this.$root.$on('editar-comprovante-internacional', () => this.prepararEdicao());
+        this.$root.$on('visualizar-comprovante-internacional', () => this.prepararVisualizacao());
     },
     methods: {
         ...mapActions({

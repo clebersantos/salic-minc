@@ -561,8 +561,8 @@ export default {
         },
     },
     mounted() {
-        this.$root.$on('editar-comprovante', () => this.prepararEdicao());
-        this.$root.$on('visualizar-comprovante', () => this.prepararVisualizacao());
+        this.$root.$on('editar-comprovante-nacional', () => this.prepararEdicao());
+        this.$root.$on('visualizar-comprovante-nacional', () => this.prepararVisualizacao());
     },
     methods: {
         ...mapActions({
