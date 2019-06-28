@@ -10,7 +10,7 @@
 
 Bem vindo/a à documentação do SALIC! Aqui você vai encontrar diversas documentações sobre o processo de desenvolvimento do SALIC, versionameno e publicação.
 
-## Passos iniciais:
+## Passos iniciais
 
 - ```composer update```
 - ```npm install```
@@ -22,45 +22,51 @@ independentemente do Sistema Operacional(SO) utilizado. Informaçoes mais detalh
 [aqui](doc/Guia_utilizacao_docker.md).
 
 Para criar um ambiente para trabalhar com o SALIC basta executar o comando abaixo:
-```
+
+```console
   docker-compose up -d
 ```
 
 Para parar o container basta digitar:
-```
+
+```console
   docker-compose down
 ```
 
 ## Front-end
-* Estamos desacoplando o front-end. [Clique aqui para ver mais](front/README.md).
+
+- Estamos desacoplando o front-end. [Clique aqui para ver mais](front/README.md).
 
 ## Submodulos
-* Esse projeto contem os manuais e implementações de layout do salic [Layout](https://github.com/culturagovbr/salic-minc-layout)
+
+- Esse projeto contem os manuais e implementações de layout do salic [Layout](https://github.com/culturagovbr/salic-minc-layout)
 
 ## Tecnologias
-* [Docker](https://www.docker.com/)
-* [PHP 7.x](http://php.net/)
-* [Zend Framework 1](https://framework.zend.com/manual/1.12/en/learning.quickstart.html) 
-* [Composer](https://getcomposer.org/)
-* [jQuery](https://jquery.com/)
-* [Vuejs](https://vuejs.org/)
-* [Webpack](https://webpack.js.org/)
-* [Materialize](http://materializecss.com/)
-* [SqlServer](https://www.microsoft.com/en-us/sql-server/sql-server-2017)
-* [Cypress](https://www.cypress.io/)
-* [Sentry](https://sentry.io/welcome/)
+
+- [Docker](https://www.docker.com/)
+- [PHP 7.x](http://php.net/)
+- [Zend Framework 1](https://framework.zend.com/manual/1.12/en/learning.quickstart.html)
+- [Composer](https://getcomposer.org/)
+- [jQuery](https://jquery.com/)
+- [Vuejs](https://vuejs.org/)
+- [Webpack](https://webpack.js.org/)
+- [Materialize](http://materializecss.com/)
+- [SqlServer](https://www.microsoft.com/en-us/sql-server/sql-server-2017)
+- [Cypress](https://www.cypress.io/)
+- [Sentry](https://sentry.io/welcome/)
 
 ## Documenta&ccedil;&atilde;o sobre a aplica&ccedil;&atilde;o
-* [Valida&ccedil;&otilde;es para versionamento](doc/Validacoes_para_versionamento.md)
-* [Teste e PHPUnit](doc/Teste_Manual.md)
-* [Esquema de desenvolvimento e banco](doc/Esquema_de_desenvolvimento_e_banco.md)
-* [Guia de operação e desenvolvimento](doc/Guia_de_operacao-desenvolvimento.md)
-* [Regras de versionamento](doc/Regras_versionamento.md)
-* [Roteiro de publicação de releases](doc/Roteiro_de_publicacao_de_releases.md) - contém o git workflow
-* [SQLs](https://github.com/culturagovbr/salic-minc-sql) de apoio ao desenvolvimento do Salic
 
+- [Valida&ccedil;&otilde;es para versionamento](doc/Validacoes_para_versionamento.md)
+- [Teste e PHPUnit](doc/Teste_Manual.md)
+- [Esquema de desenvolvimento e banco](doc/Esquema_de_desenvolvimento_e_banco.md)
+- [Guia de operação e desenvolvimento](doc/Guia_de_operacao-desenvolvimento.md)
+- [Regras de versionamento](doc/Regras_versionamento.md)
+- [Roteiro de publicação de releases](doc/Roteiro_de_publicacao_de_releases.md) - contém o git workflow
+- [SQLs](https://github.com/culturagovbr/salic-minc-sql) de apoio ao desenvolvimento do Salic
 
 ## Autores
+
 Várias pessoas colaboraram com o desenvimento do projeto SALIC e decidimos centralizar em um único local todos os que participaram com o desenvolvimento do projeto.
   
 Clique [aqui](https://github.com/culturagovbr/salic-minc/graphs/contributors) para visualizar.
