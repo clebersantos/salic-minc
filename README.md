@@ -65,6 +65,16 @@ Para parar o container basta digitar:
 - [Roteiro de publicação de releases](doc/Roteiro_de_publicacao_de_releases.md) - contém o git workflow
 - [SQLs](https://github.com/culturagovbr/salic-minc-sql) de apoio ao desenvolvimento do Salic
 
+## Serviços
+
+### Serviço de Comunicação
+
+Para utilizar o Serviço de Comunicação execute o comando abaixo.
+
+```console
+docker-compose -f docker/docker-compose-communication-service.yml up -d
+```
+
 ## Autores
 
 Várias pessoas colaboraram com o desenvimento do projeto SALIC e decidimos centralizar em um único local todos os que participaram com o desenvolvimento do projeto.
