@@ -20,9 +20,9 @@
                 <v-toolbar-title v-else>Criar Comprovante</v-toolbar-title>
                 <v-spacer/>
             </v-toolbar>
-            <v-card-text id="start">
+            <v-card-text id="start1">
                 <v-form
-                    ref="form"
+                    ref="form1"
                     v-model="valid"
                     lazy-validation
                 >
@@ -126,7 +126,7 @@
                                 md3
                             >
                                 <v-menu
-                                    ref="dataEmissaoMenu"
+                                    ref="dataEmissaoMenu1"
                                     v-model="dataEmissaoPicker"
                                     :close-on-content-click="false"
                                     :nudge-right="40"
@@ -151,13 +151,13 @@
                                         readonly
                                     />
                                     <v-date-picker
-                                        ref="dataEmissaoPicker"
+                                        ref="dataEmissaoPicker1"
                                         v-model="dataEmissao"
                                         :min="dataInicio"
                                         :max="dataFim"
                                         no-title
                                         locale="pt-br"
-                                        @change="save('dataEmissaoMenu')"
+                                        @change="save('dataEmissaoMenu1')"
                                     />
                                 </v-menu>
                             </v-flex>
@@ -227,7 +227,7 @@
                                     {{ dadosComprovante.nmArquivo }}<v-icon right>get_app</v-icon>
                                 </v-btn>
                                 <input
-                                    ref="inputComprovante"
+                                    ref="inputComprovante1"
                                     type="file"
                                     style="display: none;"
                                     accept=".pdf"
@@ -261,7 +261,7 @@
                                 lg3
                             >
                                 <v-menu
-                                    ref="dataPagamentoMenu"
+                                    ref="dataPagamentoMenu1"
                                     v-model="dataPagamentoPicker"
                                     :close-on-content-click="false"
                                     :nudge-right="40"
@@ -284,12 +284,12 @@
                                         readonly
                                     />
                                     <v-date-picker
-                                        ref="dataPagamentoPicker"
+                                        ref="dataPagamentoPicker1"
                                         v-model="dataPagamento"
                                         :max="new Date().toISOString()"
                                         no-title
                                         locale="pt-br"
-                                        @change="save('dataPagamentoMenu')"
+                                        @change="save('dataPagamentoMenu1')"
                                     />
                                 </v-menu>
                             </v-flex>
@@ -315,8 +315,8 @@
                             >
                                 <v-text-field
                                     v-money="money"
-                                    id="valor"
-                                    :hint="`*Máximo: R$ ${valorComprovar}`"
+                                    id="valor1"
+                                    :hint="`*Máximo: R$ ${modoEdicao ? (valorNumber(valorComprovar) + Number.parseFloat(dadosComprovante.valor)) : valorComprovar}`"
                                     :rules="valorRules"
                                     :readonly="modoVisualizacao"
                                     v-model.lazy="valor"
@@ -525,14 +525,14 @@ export default {
         dataEmissaoPicker(val) {
             if (val) {
                 setTimeout(() => {
-                    this.$refs.dataEmissaoPicker.activePicker = 'YEAR';
+                    this.$refs.dataEmissaoPicker1.activePicker = 'YEAR';
                 });
             }
         },
         dataPagamentoPicker(val) {
             if (val) {
                 setTimeout(() => {
-                    this.$refs.dataPagamentoPicker.activePicker = 'YEAR';
+                    this.$refs.dataPagamentoPicker1.activePicker = 'YEAR';
                 });
             }
         },
@@ -549,14 +549,14 @@ export default {
         },
         status() {
             this.dialog = false;
-            setTimeout(this.reset, 2000, this.$refs.form.resetValidation);
+            setTimeout(this.reset, 2000, this.$refs.form1.resetValidation);
             this.$root.$emit('recarregar-comprovantes');
         },
         dialog(value) {
             // Se a modal for fechada, limpar todos os campos do formulário
             if (!value) {
-                setTimeout(this.reset, 500, this.$refs.form.resetValidation);
-                document.getElementById('start').scrollTo(0, 0);
+                setTimeout(this.reset, 500, this.$refs.form1.resetValidation);
+                document.getElementById('start1').scrollTo(0, 0);
             }
         },
     },
@@ -586,7 +586,7 @@ export default {
             this.buscarAgente(this.cpfCnpjParams);
         },
         pickFile() {
-            this.$refs.inputComprovante.click();
+            this.$refs.inputComprovante1.click();
         },
         onFilePicked(e) {
             const arquivo = e.target.files[0];
@@ -635,12 +635,12 @@ export default {
             this.formaPagamento = parseInt(dados.forma, 10);
             this.dataPagamento = dados.dataPagamento.slice(0, 10);
             this.numeroDocumentoPagamento = dados.numeroDocumento;
-            document.getElementById('valor').value = Number.parseFloat(dados.valor).toFixed(2);
+            document.getElementById('valor1').value = Number.parseFloat(dados.valor).toFixed(2);
             this.justificativa = dados.justificativa;
         },
         submit() {
             this.buscarFornecedor(this.cpfCnpj);
-            this.$refs.form.validate();
+            this.$refs.form1.validate();
 
             if (this.valid && this.agenteEhCadastrado) {
                 const formData = new FormData();
@@ -702,12 +702,12 @@ export default {
             this.serie = '';
             this.nomeArquivo = '';
             this.arquivo = '';
-            this.$refs.inputComprovante.value = '';
+            this.$refs.inputComprovante1.value = '';
             this.foiAtualizado = false;
             this.formaPagamento = 1;
             this.dataPagamento = '';
             this.numeroDocumentoPagamento = '';
-            document.getElementById('valor').value = 0;
+            document.getElementById('valor1').value = 0;
             this.valor = 'R$ 0,00';
             this.justificativa = '';
             this.limparAgente();
