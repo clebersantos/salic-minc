@@ -290,6 +290,8 @@ export default {
             this.acao = status.acao;
             this.mensagemFinal = status.success ? this.mensagemSucesso : this.mensagemFalha;
             this.snackbar = true;
+            this.setDadosProjeto(this.idPronac);
+            this.setDadosItem(this.dadosItemParams);
         },
     },
     mounted() {

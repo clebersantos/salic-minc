@@ -50,16 +50,16 @@
                             <span>Editar</span>
                         </v-tooltip>
 
-                            <v-btn
-                                v-if="props.item.tipo == 6"
-                                slot="activator"
-                                flat
-                                icon
-                                color="green"
-                                @click="openModalNFe(props.item)"
-                            >
-                                <v-icon>edit</v-icon>
-                            </v-btn>
+                        <v-btn
+                            v-if="props.item.tipo == 6"
+                            slot="activator"
+                            flat
+                            icon
+                            color="blue"
+                            @click="openModalNFe(props.item)"
+                        >
+                            <v-icon>edit</v-icon>
+                        </v-btn>
 
                         <!-- Excluir Comprovante -->
                         <v-tooltip

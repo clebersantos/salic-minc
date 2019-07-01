@@ -507,8 +507,8 @@ export default {
                         endereco: this.endereco,
                     },
                     arquivo: {
-                        nome: this.nomeArquivo,
                         file: this.arquivo,
+                        nome: this.nomeArquivo,
                     },
                     item: this.idPlanilhaItens,
                     idPlanilhaAprovacao: this.idPlanilhaAprovacao,
@@ -533,8 +533,8 @@ export default {
                 }
 
                 const comprovanteJSON = JSON.stringify(comprovante);
-                formData.append('comprovante', comprovanteJSON);
                 formData.append('arquivo', this.arquivo);
+                formData.append('comprovante', comprovanteJSON);
 
                 if (this.modoEdicao) {
                     this.editarComprovante(formData);
