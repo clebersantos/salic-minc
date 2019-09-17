@@ -1,0 +1,165 @@
+<template>
+    <v-data-table
+        :headers="headers"
+        :items="produtos"
+        :rows-per-page-items="[15, 35, 50, {'text': 'Todos', value: -1}]"
+        :search="search"
+        item-key="idDistribuirParecer"
+        class="elevation-1"
+        disable-initial-sort
+    >
+        <template
+            slot="items"
+            slot-scope="props"
+        >
+            <tr :class="mxObterClasseItem(props.item)">
+                <td-numero-pronac :produto="props.item" />
+                <td>{{ props.item.nomeProjeto }}</td>
+                <td-nome-produto :produto="props.item" />
+                <td-tipo-produto :produto="props.item" />
+                <td>{{ props.item.segmento }}</td>
+                <td>{{ props.item.nomeParecerista }}</td>
+                <td class="text-xs-right">
+                    {{ props.item.dtDistribuicao | formatarData }}
+                </td>
+                <td
+                    class="text-xs-center"
+                    style="min-width: 212px"
+                >
+                    <v-tooltip
+                        bottom
+                    >
+                        <v-btn
+                            slot="activator"
+                            color="blue-grey darken-2"
+                            flat
+                            icon
+                            class="ma-0"
+                            @click="$emit('visualizar-detalhes', props.item)"
+                        >
+                            <v-icon>
+                                visibility
+                            </v-icon>
+                        </v-btn>
+                        <span>Visualizar detalhes</span>
+                    </v-tooltip>
+                    <v-tooltip
+                        bottom
+                    >
+                        <v-btn
+                            slot="activator"
+                            color="blue-grey darken-2"
+                            flat
+                            icon
+                            class="ma-0"
+                            @click="$emit('distribuir-produto', props.item)"
+                        >
+                            <v-icon>
+                                person
+                            </v-icon>
+                        </v-btn>
+                        <span>Distribuir produto</span>
+                    </v-tooltip>
+                    <v-tooltip
+                        bottom
+                    >
+                        <v-btn
+                            slot="activator"
+                            color="blue-grey darken-2"
+                            flat
+                            icon
+                            class="ma-0"
+                            @click="$emit('visualizar-historico', props.item)"
+                        >
+                            <v-icon>
+                                history
+                            </v-icon>
+                        </v-btn>
+                        <span>Visualizar histórico</span>
+                    </v-tooltip>
+                </td>
+            </tr>
+        </template>
+
+        <template slot="no-data">
+            <div class="text-xs-center">
+                Sem produtos em análise
+            </div>
+        </template>
+    </v-data-table>
+</template>
+
+<script>
+
+/** mixins */
+import MxUtils from '@/mixins/utils';
+import MxUtilsParecer from '@/modules/parecer/mixins/UtilsParecer';
+
+import TdNomeProduto from '@/modules/parecer/components/gerenciar-paineis/TdNomeProduto';
+import TdTipoProduto from '@/modules/parecer/components/gerenciar-paineis/TdTipoProduto';
+import TdNumeroPronac from '@/modules/parecer/components/gerenciar-paineis/TdNumeroPronac';
+
+export default {
+    name: 'GerenciarListaItensAguardandoAnalise',
+    components: { TdNumeroPronac, TdTipoProduto, TdNomeProduto },
+    mixins: [MxUtils, MxUtilsParecer],
+
+    props: {
+        produtos: {
+            type: Array,
+            default: () => [],
+        },
+        search: {
+            type: String,
+            default: '',
+        },
+    },
+
+    data() {
+        return {
+            headers: [
+                {
+                    text: 'Pronac',
+                    value: 'pronac',
+                    width: '1',
+                },
+                {
+                    text: 'Nome do Projeto',
+                    align: 'left',
+                    value: 'nomeProjeto',
+                },
+                {
+                    text: 'Produto',
+                    align: 'left',
+                    value: 'nomeProduto',
+                },
+                {
+                    text: 'Tipo',
+                    value: 'stPrincipal',
+                    width: '2',
+                },
+                {
+                    text: 'Segmento',
+                    align: 'left',
+                    value: 'segmento',
+                },
+                {
+                    text: 'Parecerista',
+                    align: 'left',
+                    value: 'nomeParecerista',
+                },
+                {
+                    text: 'Dt. de Envio',
+                    value: 'dtDistribuicao',
+                    width: '2',
+                },
+                {
+                    text: 'Ações',
+                    width: '2',
+                    value: 'siAnalise',
+                },
+            ],
+        };
+    },
+};
+</script>

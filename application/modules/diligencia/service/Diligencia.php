@@ -35,14 +35,14 @@ class Diligencia implements \MinC\Servico\IServicoRestZend
             }
 
             $tbDiligenciaDbTable = new \Diligencia_Model_DbTable_TbDiligencia();
-            
+
             if ($idReadequacao) {
                 $where = [
                     'tbReadequacao.idReadequacao = ?' => $idReadequacao
                 ];
                 return $tbDiligenciaDbTable->listarDiligenciasReadequacao($where)->toArray();
             } else {
-                
+
                 $whereDiligencia = ['pro.IdPRONAC = ?' => $idPronac];
 
                 if (!empty($idProduto) && $idProduto != 'null') {
@@ -91,7 +91,7 @@ class Diligencia implements \MinC\Servico\IServicoRestZend
                 'pro.IdPRONAC = ?' => $idPronac,
                 'dil.idDiligencia = ?' => $idDiligencia,
             ];
-            
+
             if ($idReadequacao) {
                 $where = [
                     'tbReadequacao.idReadequacao = ?' => $idReadequacao
@@ -139,7 +139,7 @@ class Diligencia implements \MinC\Servico\IServicoRestZend
             }
 
             $diligenciaDAO = new \Diligencia();
-            
+
             if ($idReadequacao) {
                 $tbDiligenciaDbTable = new \Diligencia_Model_DbTable_TbDiligencia();
                 $where = [
@@ -179,7 +179,7 @@ class Diligencia implements \MinC\Servico\IServicoRestZend
                 'stEstado' => 0,
                 'stEnviado' => 'N'
             );
-            
+
             // @todo a trigger no banco já salva como stEnviado ='S' ao inserir
             if ($confirmaEnvio == 1) {
                 $dados['stEnviado'] = 'S';
@@ -199,13 +199,13 @@ class Diligencia implements \MinC\Servico\IServicoRestZend
                     ['idDiligencia = ?' => $diligenciaEmEdicao['idDiligencia']]
                 );
             }
-            
+
             if ($idReadequacao) {
                 $dados['stEnviado'] = 'S';
                 $idDiligencia = $diligenciaDAO->inserirDiligencia($dados);
 
                 $tbReadequacaoXtbDiligencia = new \Readequacao_Model_DbTable_TbReadequacaoXtbDiligencia();
-                
+
                 $dados = [];
                 $dados['idReadequacao'] = $idReadequacao;
                 $dados['idDiligencia'] = $idDiligencia;
