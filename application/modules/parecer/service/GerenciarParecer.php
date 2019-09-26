@@ -109,7 +109,7 @@ class GerenciarParecer implements \MinC\Servico\IServicoRestZend
         $modelDistribuicao->setSiAnalise($params['siAnalise']);
         $modelDistribuicao->setSiEncaminhamento($params['siEncaminhamento']);
 
-        if (strlen($modelDistribuicao->getObservacao()) < 11) {
+        if (strlen($modelDistribuicao->getObservacao()) <= 11) {
             throw new \Exception("O campo observa&ccedil;&atilde;o deve ter no m&iacute;nimo 11 caracteres");
         }
 
@@ -152,40 +152,86 @@ class GerenciarParecer implements \MinC\Servico\IServicoRestZend
     private function encaminharAposAnaliseComplementar($params)
     {
         $whereDistribuicaoAtual = ["idDistribuirParecer = ?" => $params['idDistribuirParecer']];
+
         $tbDistribuirParecer = new \Parecer_Model_DbTable_TbDistribuirParecer();
-        $distribuicao = $tbDistribuirParecer->findBy($whereDistribuicaoAtual);
+        $distribuicaoAtual = $tbDistribuirParecer->findBy($whereDistribuicaoAtual);
+        if (empty($distribuicaoAtual)) {
+            throw new \Exception("Distribui&ccedil;&atilde;o n&atilde;o encontrada");
+        }
 
-        $parecerDbTable = new \Parecer_Model_DbTable_Parecer();
-        $parecer = $parecerDbTable->findBy([
-            'IdPRONAC' => $distribuicao['idPRONAC'],
-            'idTipoAgente' => 1,
-            'stAtivo' => 1,
-        ]);
+        if ($distribuicaoAtual['stPrincipal'] == \Parecer_Model_TbDistribuirParecer::ST_PRODUTO_SECUNDARIO) {
+            $this->devolverProdutoParaCoordenador($distribuicaoAtual);
+        }
 
+        $whereDistribuicaoPrincipal = [
+            'IdPRONAC = ?' => $distribuicaoAtual['idPRONAC'],
+            'stEstado = ?' => \Parecer_Model_TbDistribuirParecer::ST_ESTADO_ATIVO,
+            'stPrincipal = ?' => \Parecer_Model_TbDistribuirParecer::ST_PRODUTO_PRINCIPAL,
+        ];
+
+        $distribuicaoPrincipal = $tbDistribuirParecer->findBy($whereDistribuicaoPrincipal);
+
+        if ($this->isValorSugeridoAlterado($distribuicaoAtual['idPRONAC'])) {
+            return $this->devolverProdutoPrincipalAoParecerista($distribuicaoPrincipal);
+        }
+        return $this->devolverProdutoParaCoordenador($distribuicaoPrincipal);
+    }
+
+    private function devolverProdutoPrincipalAoParecerista($distribuicao)
+    {
         $tbDistribuirParecerMapper = new \Parecer_Model_TbDistribuirParecerMapper();
+        $agenteDistribuicaoOriginal = $tbDistribuirParecerMapper->obterAgenteAvaliacaoOriginal(
+            $distribuicao['idPRONAC'],
+            $distribuicao['idProduto'],
+            $distribuicao['stPrincipal']
+        );
+
+        $distribuicao['idAgenteParecerista'] = $agenteDistribuicaoOriginal['idAgenteParecerista'];
+        $distribuicao['idOrgaoOrigem'] = $agenteDistribuicaoOriginal['idOrgao'];
+
+        $modelDistribuicao = new \Parecer_Model_TbDistribuirParecer($distribuicao);
+        $modelDistribuicao->setIdOrgao($distribuicao['idOrgaoOrigem']);
+        $modelDistribuicao->setSiAnalise(\Parecer_Model_TbDistribuirParecer::SI_ANALISE_EM_ANALISE);
+        $modelDistribuicao->setSiEncaminhamento(\TbTipoEncaminhamento::SOLICITACAO_ENCAMINHADA_AO_PARECERISTA);
+        $modelDistribuicao->setObservacao('Produto devolvido ao parecerista para nova análise após an&aacute;lise complementar tendo em vista que houve alteração de valor');
+
+        $tbDistribuirParecerMapper->distribuirProdutoParaParecerista($modelDistribuicao);
+        return $tbDistribuirParecerMapper->prepararProjetoParaAnalise($modelDistribuicao->getIdPRONAC());
+    }
+
+    private function devolverProdutoParaCoordenador($distribuicao)
+    {
+        $tbDistribuirParecerMapper = new \Parecer_Model_TbDistribuirParecerMapper();
+        $agenteDistribuicaoOriginal = $tbDistribuirParecerMapper->obterAgenteAvaliacaoOriginal(
+            $distribuicao['idPRONAC'],
+            $distribuicao['idProduto'],
+            $distribuicao['stPrincipal']
+        );
+
+        $distribuicao['idAgenteParecerista'] = $agenteDistribuicaoOriginal['idAgenteParecerista'];
+        $distribuicao['idOrgaoOrigem'] = $agenteDistribuicaoOriginal['idOrgao'];
 
         $modelDistribuicao = new \Parecer_Model_TbDistribuirParecer($distribuicao);
         $modelDistribuicao->setIdOrgao($distribuicao['idOrgaoOrigem']);
         $modelDistribuicao->setTipoAnalise(\Parecer_Model_TbDistribuirParecer::TIPO_ANALISE_PRODUTO_COMPLETO);
-        $modelDistribuicao->setIdAgenteParecerista($tbDistribuirParecerMapper->obterIdPareceristaOriginalProduto(
-            $distribuicao['idPRONAC'],
-            $distribuicao['idProduto']
-        ));
-
-        $planilhaprojeto = new \PlanilhaProjeto();
-        $totalSugerido = $planilhaprojeto->somarPlanilhaProjeto($distribuicao['idPRONAC'], 109)['soma'];
-
-        if (round($parecer['SugeridoReal'], 2) != round($totalSugerido, 2)) {
-            $modelDistribuicao->setSiAnalise(\Parecer_Model_TbDistribuirParecer::SI_ANALISE_EM_ANALISE);
-            $modelDistribuicao->setSiEncaminhamento(\TbTipoEncaminhamento::SOLICITACAO_ENCAMINHADA_AO_PARECERISTA);
-            $tbDistribuirParecerMapper->distribuirProdutoParaParecerista($modelDistribuicao);
-            return $tbDistribuirParecerMapper->prepararProjetoParaAnalise($distribuicao['idPRONAC']);
-        }
-
         $modelDistribuicao->setSiAnalise(\Parecer_Model_TbDistribuirParecer::SI_ANALISE_COMPLEMENTAR_DEVOLVIDO);
         $modelDistribuicao->setSiEncaminhamento(\TbTipoEncaminhamento::SOLICITACAO_DEVOLVIDA_AO_COORDENADOR_PELO_PARECERISTA);
-
+        $modelDistribuicao->setObservacao('Devolvido ao coordenador ap&oacute;s an&aacute;lise complementar');
         return $tbDistribuirParecerMapper->devolverProdutoParaCoordenador($modelDistribuicao);
     }
 
+    private function isValorSugeridoAlterado($idPronac)
+    {
+        $parecerDbTable = new \Parecer_Model_DbTable_Parecer();
+        $parecer = $parecerDbTable->findBy([
+            'IdPRONAC' => $idPronac,
+            'idTipoAgente' => 1,
+            'stAtivo' => 1,
+        ]);
+
+        $planilhaprojeto = new \PlanilhaProjeto();
+        $totalSugerido = $planilhaprojeto->somarPlanilhaProjeto($idPronac, 109)['soma'];
+
+        return (round($parecer['SugeridoReal'], 2) != round($totalSugerido, 2));
+    }
 }

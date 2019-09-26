@@ -77,6 +77,7 @@
                             v-model="modal.show"
                             :produto="produtoSelecionado"
                             :filtro="filtro"
+                            @recarregar-lista="recarregarLista()"
                         />
                     </v-card-text>
                 </v-card>
@@ -175,7 +176,6 @@ export default {
             component: '',
         },
         produtoImpedimento: {},
-        produtos: [],
         produtoSelecionado: {},
         expand: false,
         loading: true,
@@ -184,7 +184,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            obterProdutos: 'parecer/getProdutos',
+            produtos: 'parecer/getProdutos',
         }),
         filtroSelecionado() {
             return this.filtros.find(item => item.id === this.filtro);
@@ -192,20 +192,13 @@ export default {
     },
 
     watch: {
-        obterProdutos(val) {
-            this.produtos = val;
-            this.loading = false;
-        },
         filtro(v) {
-            this.loading = true;
-            if (this.$route.params.filtro !== v) {
-                this.obterProdutosParaGerenciar({ filtro: v });
-                this.$router.push({ name: 'parecer-gerenciar-listar-view', params: { filtro: v } });
-            }
+            this.obterProdutosParaGerenciar({ filtro: v });
+            this.$router.push({ name: 'parecer-gerenciar-listar-view', params: { filtro: v } });
         },
         $route(prev, old) {
-            if (!!prev.params.filtro && !!old.params.filtro && prev.params.filtro !== old.params.filtro) {
-                this.filtro = prev.params.filtro;
+            if (prev.params.filtro !== old.params.filtro) {
+                this.filtro = prev.params.filtro || 'aguardando_distribuicao';
             }
         },
     },
@@ -219,12 +212,22 @@ export default {
 
     methods: {
         ...mapActions({
-            obterProdutosParaGerenciar: 'parecer/obterProdutosParaGerenciar',
+            obterProdutosParaGerenciarAction: 'parecer/obterProdutosParaGerenciar',
         }),
         abrirDialog(produto, component) {
             this.produtoSelecionado = produto;
             this.modal.component = component;
             this.modal.show = true;
+        },
+        obterProdutosParaGerenciar(params) {
+            this.loading = true;
+            this.obterProdutosParaGerenciarAction(params)
+                .finally(() => {
+                    this.loading = false;
+                });
+        },
+        recarregarLista() {
+            this.obterProdutosParaGerenciar({ filtro: this.filtro });
         },
     },
 };
