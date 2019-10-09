@@ -1,10 +1,12 @@
 <template>
     <carregando
         v-if="Object.keys(dadosProjeto).length == 0"
-        :text="'Carregando ...'"/>
+        text="Carregando ..."
+    />
     <v-container
         v-else
-        fluid>
+        fluid
+    >
         <v-toolbar>
             <v-btn
                 icon
@@ -14,27 +16,23 @@
                 <v-icon>arrow_back</v-icon>
             </v-btn>
             <v-toolbar-title>
-                Planilha
+                Planilha: {{ dadosProjeto.items.pronac }} &#45; {{ dadosProjeto.items.nomeProjeto }}
             </v-toolbar-title>
+            <v-spacer />
+
+            <v-chip v-if="isProjetoDiligenciado">
+                Projeto diligenciado
+            </v-chip>
+            <v-chip v-else-if="estado.estadoId == 5">
+                Projeto em analise
+            </v-chip>
+            <historico-diligencias
+                :id-pronac="idPronac"
+                :obj="dadosProjeto.items.diligencia"
+            />
         </v-toolbar>
         <v-card>
-            <v-card-title primary-title>
-                <h2>{{ dadosProjeto.items.pronac }} &#45; {{ dadosProjeto.items.nomeProjeto }}</h2>
-            </v-card-title>
             <v-card-text>
-                <v-alert
-                    v-if="dadosProjeto.items.diligencia"
-                    :value="true"
-                    color="info"
-                >
-                    Existe Diligência para esse projeto. Acesse
-                    <a
-                        :href="
-                            '/proposta/diligenciar/listardiligenciaanalista/idPronac/'
-                        + idPronac">
-                        aqui
-                    </a>.
-                </v-alert>
                 <v-alert
                     v-if="documento != 0"
                     :value="true"
@@ -42,42 +40,23 @@
                 >
                     Existe Documento para assinar nesse projeto.
                 </v-alert>
-                <v-alert
-                    v-if="estado.estadoId == 5"
-                    :value="true"
-                    color="info"
-                >Projeto em analise.
-                </v-alert>
-                <div class="mt-4 mb-3">
-                    <div class="d-inline-block text-xs-right">
-                        <h4>Valor Aprovado</h4>
-                        R$ {{ dadosProjeto.items.vlAprovado | moedaMasc }}
-                    </div>
-                    <div class="d-inline-block ml-5 text-xs-right">
-                        <h4>Valor Comprovado</h4>
-                        R$ {{ dadosProjeto.items.vlComprovado | moedaMasc }}
-                    </div>
-                    <div class="d-inline-block ml-5 text-xs-right">
-                        <h4>Valor a Comprovar</h4>
-                        R$ {{ dadosProjeto.items.vlTotalComprovar | moedaMasc }}
-                    </div>
-                </div>
+                <parecer-tecnico-planilha-header :dados="dadosProjeto" />
             </v-card-text>
             <v-card-actions>
-
                 <v-btn
                     :href="'/consultardadosprojeto/index?idPronac=' + idPronac"
                     color="success"
                     target="_blank"
                     class="mr-2"
                     dark
-                >VER PROJETO</v-btn>
+                >
+                    VER PROJETO
+                </v-btn>
 
                 <consolidacao-analise
                     :id-pronac="idPronac"
                     :nome-projeto="dadosProjeto.items.nomeProjeto"
                 />
-
             </v-card-actions>
         </v-card>
         <template v-if="Object.keys(planilha).length > 0 && planilha.error">
@@ -91,7 +70,8 @@
         <template v-else-if="Object.keys(planilha).length">
             <v-card
                 class="mt-3"
-                flat>
+                flat
+            >
                 <!-- PRODUTO -->
                 <v-expansion-panel
                     :v-if="getPlanilha != undefined && Object.keys(getPlanilha)"
@@ -104,8 +84,11 @@
                     >
                         <v-layout
                             slot="header"
-                            class="green--text">
-                            <v-icon class="mr-3 green--text">perm_media</v-icon>
+                            class="green--text"
+                        >
+                            <v-icon class="mr-3 green--text">
+                                perm_media
+                            </v-icon>
                             {{ produto.produto }}
                         </v-layout>
                         <!-- ETAPA -->
@@ -120,8 +103,11 @@
                             >
                                 <v-layout
                                     slot="header"
-                                    class="orange--text">
-                                    <v-icon class="mr-3 orange--text">label</v-icon>
+                                    class="orange--text"
+                                >
+                                    <v-icon class="mr-3 orange--text">
+                                        label
+                                    </v-icon>
                                     {{ etapa.etapa }}
                                 </v-layout>
                                 <!-- UF -->
@@ -136,8 +122,11 @@
                                     >
                                         <v-layout
                                             slot="header"
-                                            class="blue--text">
-                                            <v-icon class="mr-3 blue--text">place</v-icon>
+                                            class="blue--text"
+                                        >
+                                            <v-icon class="mr-3 blue--text">
+                                                place
+                                            </v-icon>
                                             {{ uf.Uf }}
                                         </v-layout>
                                         <!-- CIDADE -->
@@ -152,8 +141,11 @@
                                             >
                                                 <v-layout
                                                     slot="header"
-                                                    class="blue--text">
-                                                    <v-icon class="mr-3 blue--text">place</v-icon>
+                                                    class="blue--text"
+                                                >
+                                                    <v-icon class="mr-3 blue--text">
+                                                        place
+                                                    </v-icon>
                                                     {{ cidade.cidade }}
                                                 </v-layout>
                                                 <template
@@ -167,7 +159,7 @@
                                                             :key="index"
                                                             ripple
                                                         >
-                                                            {{ tabs[tab] }}
+                                                            <b>{{ tabs[tab] }}</b>
                                                         </v-tab>
                                                         <v-tab-item
                                                             v-for="item in cidade.itens"
@@ -180,15 +172,26 @@
                                                             >
                                                                 <template
                                                                     slot="items"
-                                                                    slot-scope="props">
+                                                                    slot-scope="props"
+                                                                >
                                                                     <td>
                                                                         {{ props.item.item }}
                                                                     </td>
-                                                                    <td class="text-xs-right">{{ (props.item.quantidade) }}</td>
-                                                                    <td class="text-xs-right">{{ (props.item.numeroOcorrencias) }}</td>
-                                                                    <td class="text-xs-right">{{ props.item.valor | moedaMasc }}</td>
-                                                                    <td class="text-xs-right">{{ props.item.varlorAprovado | moedaMasc }}</td>
-                                                                    <td class="text-xs-right">{{ props.item.varlorComprovado | moedaMasc }}</td>
+                                                                    <td class="text-xs-right">
+                                                                        {{ (props.item.quantidade) }}
+                                                                    </td>
+                                                                    <td class="text-xs-right">
+                                                                        {{ (props.item.numeroOcorrencias) }}
+                                                                    </td>
+                                                                    <td class="text-xs-right">
+                                                                        {{ props.item.valor | moedaMasc }}
+                                                                    </td>
+                                                                    <td class="text-xs-right">
+                                                                        {{ props.item.varlorAprovado | moedaMasc }}
+                                                                    </td>
+                                                                    <td class="text-xs-right">
+                                                                        {{ props.item.varlorComprovado | moedaMasc }}
+                                                                    </td>
                                                                     <td class="text-xs-right">
                                                                         {{ (props.item.varlorAprovado - props.item.varlorComprovado) | moedaMasc }}
                                                                     </td>
@@ -244,7 +247,7 @@
             <Carregando :text="'Carregando planilha ...'" />
         </template>
         <v-speed-dial
-            v-if="(!dadosProjeto.items.diligencia)"
+            v-if="(!isProjetoDiligenciado)"
             v-model="fab"
             bottom
             right
@@ -265,8 +268,8 @@
             </v-btn>
             <v-tooltip
                 v-if="(documento != 0)"
-                left>
-
+                left
+            >
                 <v-btn
                     slot="activator"
                     :href="'/assinatura/index/visualizar-projeto?idDocumentoAssinatura=' + documento.idDocumentoAssinatura"
@@ -280,8 +283,9 @@
                 <span>Assinar</span>
             </v-tooltip>
             <v-tooltip
-                v-if="(documento == 0 && !dadosProjeto.items.diligencia)"
-                left>
+                v-if="(documento == 0 && !isProjetoDiligenciado)"
+                left
+            >
                 <v-btn
                     slot="activator"
                     :to="'/emitir-parecer/' + idPronac"
@@ -296,8 +300,9 @@
                 <span>Emitir Parecer</span>
             </v-tooltip>
             <v-tooltip
-                v-if="(documento == 0) && !dadosProjeto.items.diligencia"
-                left>
+                v-if="(documento == 0) && !isProjetoDiligenciado"
+                left
+            >
                 <v-btn
                     slot="activator"
                     :to="'/diligenciar/' + idPronac"
@@ -321,12 +326,16 @@ import Carregando from '@/components/CarregandoVuetify';
 import ConsolidacaoAnalise from '../components/ConsolidacaoAnalise';
 import AnalisarItem from './AnalisarItem';
 import Moeda from '../../../../filters/money';
+import HistoricoDiligencias from '@/modules/avaliacaoResultados/components/components/HistoricoDiligencias';
+import ParecerTecnicoPlanilhaHeader from '@/modules/avaliacaoResultados/components/ParecerTecnico/PlanilhaHeader';
 
 Vue.filter('moedaMasc', Moeda);
 
 export default {
     name: 'Planilha',
     components: {
+        ParecerTecnicoPlanilhaHeader,
+        HistoricoDiligencias,
         ConsolidacaoAnalise,
         AnalisarItem,
         Carregando,
@@ -392,6 +401,10 @@ export default {
             let planilha = this.getPlanilha;
             planilha = (planilha !== null && Object.keys(planilha).length) ? this.getPlanilha : 0;
             return planilha;
+        },
+        isProjetoDiligenciado() {
+            const { diligencia } = this.dadosProjeto.items;
+            return diligencia && diligencia.DtSolicitacao && !diligencia.DtResposta;
         },
     },
     mounted() {
