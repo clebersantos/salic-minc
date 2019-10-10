@@ -8,7 +8,7 @@ class AvaliacaoResultados_ProjetoController extends MinC_Controller_Rest_Abstrac
     public function __construct(Zend_Controller_Request_Abstract $request, Zend_Controller_Response_Abstract $response, array $invokeArgs = array())
     {
         $profiles = [
-            // Autenticacao_Model_Grupos::TECNICO_PRESTACAO_DE_CONTAS,
+//             Autenticacao_Model_Grupos::TECNICO_PRESTACAO_DE_CONTAS,
             // Autenticacao_Model_Grupos::COORDENADOR_PRESTACAO_DE_CONTAS,
             // Autenticacao_Model_Grupos::COORDENADOR_GERAL_PRESTACAO_DE_CONTAS,
         ];
@@ -31,11 +31,16 @@ class AvaliacaoResultados_ProjetoController extends MinC_Controller_Rest_Abstrac
         $projeto = new Projetos();
         $projeto = $projeto->buscarDadosCompletos($idPronac);
 
-        $data['nomeProjeto'] = $projeto->current()['NomeProjeto'];
+        $tbProjeto = new Projetos();
+        $projeto = $tbProjeto->findBy(['idPronac = ?' => $idPronac]);
+
+        $data['nomeProjeto'] = $projeto['NomeProjeto'];
         $data['vlTotalComprovar'] = $consolidacao->valorAprovadoProjeto - $consolidacao->valorComprovado;
         $data['vlAprovado'] = $consolidacao->valorAprovadoProjeto;
         $data['vlComprovado'] = $consolidacao->valorComprovado;
-        $data['pronac'] = $projeto->current()['AnoProjeto'] . $projeto->current()['Sequencial'];
+        $data['pronac'] = $projeto['AnoProjeto'] . $projeto['Sequencial'];
+        $data['dtInicioExecucao'] = $projeto['DtInicioExecucao'];
+        $data['dtFimExecucao'] = $projeto['DtFimExecucao'];
 
         $tbDiligencia = new Diligencia();
         $diligencia = $tbDiligencia->buscarUltDiligencia([
