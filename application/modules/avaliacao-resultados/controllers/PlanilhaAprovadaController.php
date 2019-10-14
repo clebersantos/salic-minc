@@ -26,7 +26,10 @@ class AvaliacaoResultados_PlanilhaAprovadaController extends MinC_Controller_Res
         $planilhaAprovacaoModel = new PlanilhaAprovacao();
         $resposta = $planilhaAprovacaoModel->planilhaAprovada($idPronac);
         /* var_dump(empty($resposta->toArray()));die; */
+        $data = \TratarArray::utf8EncodeArray($resposta->toArray());
+        $data = $this->filtrarPlanilhaParaAnalise($data);
 
+        return $this->customRenderJsonResponse($data, $code);
         $planilhaJSON = null;
 
         if(!empty($resposta->toArray())) {
@@ -112,6 +115,43 @@ class AvaliacaoResultados_PlanilhaAprovadaController extends MinC_Controller_Res
         /* $data = \TratarArray::utf8EncodeArray($data); */
 
         $this->customRenderJsonResponse($data, $code);
+    }
+
+    private function filtrarPlanilhaParaAnalise($planilha)
+    {
+        $i = 0;
+
+        $novaPlanilha = [];
+        foreach ($planilha as $item) {
+            $row = $item;
+            $i++;
+            unset($row['Pronac']);
+            unset($row['NomeProjeto']);
+            unset($row['Uf']);
+            unset($row['Cidade']);
+            unset($row['Item']);
+            unset($row['Etapa']);
+            unset($row['Descricao']);
+
+            $row["Seq"] = $i;
+            $row['Produto'] = !empty($item['cdProduto'])
+                ? $item['Produto']
+                : html_entity_decode('Administra&ccedil;&atilde;o do Projeto');
+
+
+            $row['vlAComprovar'] = $row['vlAprovado'] - $row['vlComprovado'];
+
+            // corrigir no front e depois remover
+            $row['varlorComprovado'] = $row['vlComprovado'];
+            $row['varlorAprovado'] = $row['vlAprovado'];
+            $row['varlorAprovado'] = $row['vlAprovado'];
+            $row['produto'] = $row['Produto'];
+            $row['item'] = $row['descItem'];
+
+            $novaPlanilha[] = $row;
+        }
+
+        return $novaPlanilha;
     }
 
     public function indexAction(){}

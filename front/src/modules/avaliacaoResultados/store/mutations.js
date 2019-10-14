@@ -206,45 +206,29 @@ export const mutations = {
             4: 0, // aguardando analise
         };
 
-        const copiaState = state
-            .planilha[params.cdProduto]
-            .etapa[params.etapa]
-            .UF[params.cdUf]
-            .cidade[params.idmunicipio]
-            .itens;
-
-        const copiaItem = _.cloneDeep(copiaState.todos[params.idPlanilhaItem]);
-
+        let totalComprovantes = 0;
         state.comprovantes.forEach((comprovante) => {
             tiposXQuantidade[comprovante.stItemAvaliado] += 1;
+            totalComprovantes += 1;
         });
 
-        Object.keys(tiposXQuantidade).forEach((tipo) => {
-            const quantidade = tiposXQuantidade[tipo];
-            if (quantidade === 0) {
-                if (typeof copiaState[tipo] !== 'undefined') {
-                    Vue.delete(copiaState[tipo], params.idPlanilhaItem);
+        const index = state.planilha.findIndex(
+            item => item.cdProduto === params.cdProduto
+            && item.cdEtapa === params.cdEtapa
+            && item.cdUF === params.cdUF
+            && item.cdCidade === params.cdCidade
+            && item.idPlanilhaItens === params.idPlanilhaItens,
+        );
 
-                    if (Object.keys(copiaState[tipo]).length === 0) {
-                        Vue.delete(copiaState, tipo);
-                    }
-                }
-                return;
-            }
-
-            if (typeof copiaState[tipo] === 'undefined') {
-                Vue.set(copiaState, tipo, {});
-            }
-            Vue.set(copiaState[tipo], params.idPlanilhaItem, copiaItem);
-        });
-    },
-    [types.DASHBOARD_QUANTIDADE](state, dados) {
-        state.dashboard = dados;
+        if (index >= 0) {
+            state.planilha[index] = Object.assign(state.planilha[index], {
+                qtComprovado: totalComprovantes,
+                qtComprovadoRecusada: tiposXQuantidade[3],
+                qtComprovadoValidado: tiposXQuantidade[1],
+            });
+        }
     },
     [types.SET_ESTATISTICAS_AVALIACAO](state, dados) {
         state.estatisticasAvaliacao = dados;
-    },
-    [types.SYNC_PROJETOS_SIMILARES](state, dados) {
-        state.projetosSimilares = dados;
     },
 };

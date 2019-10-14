@@ -1,5 +1,7 @@
 <template>
-    <v-container class="testeeeee" fluid>
+    <v-container
+        fluid
+    >
         <v-subheader>
             <h2>{{ route.meta.title }}</h2>
         </v-subheader>
@@ -13,46 +15,7 @@
             >
                 <v-tabs-slider color="deep-orange accent-3" />
                 <v-tab
-                    href="#tab-6"
-                    @click="r('/painel/dashboard')"
-                >
-                    Dashboard
-                    <v-icon>assignment_ind</v-icon>
-                </v-tab>
-                <v-tab-item
-                    :key="6"
-                    :value="'tab-6'"
-                >
-                    <v-card
-                        flat
-                        class="pa-2"
-                    >
-                        <v-layout
-                            align-center
-                            justify-space-around
-                            row
-                            style="min-height: calc(100vh - 318px)"
-                        >
-                            <v-card
-                                v-for="(dashboad, index) in dashboardItens"
-                                :key="index"
-                                max-width="400"
-                            >
-                                <v-card-title>
-                                    <span class="title font-weight-light">{{ index }}</span>
-                                </v-card-title>
-
-                                <v-card-text class="headline font-weight-bold ">
-                                    <p class="display-3 text-xs-center">
-                                        <a :href="dashboad.url">{{ dashboad.valor }}</a>
-                                    </p>
-                                </v-card-text>
-                            </v-card>
-                        </v-layout>
-                    </v-card>
-                </v-tab-item>
-                <v-tab
-                    v-if="getUsuario.grupo_ativo == 125"
+                    v-if="usuarioGetter.grupo_ativo === CONST.PERFIL_COORDENADOR"
                     href="#tab-0"
                     @click="r('/painel/distribuir')"
                 >
@@ -127,6 +90,7 @@
                         v-if="getProjetosParaDistribuir"
                         :dados="getProjetosParaDistribuir"
                         :componentes="distribuirAcoes"
+                        :loading="Object.keys(getProjetosParaDistribuir).length === 0"
                     />
                 </v-tab-item>
                 <v-tab-item
@@ -139,17 +103,20 @@
                     >
                         <v-card-text>
                             <TabelaProjetos
-                                v-if="(getUsuario.grupo_ativo == 125 || getUsuario.grupo_ativo == 126)"
+                                v-if="(usuarioGetter.grupo_ativo === CONST.PERFIL_COORDENADOR
+                                    || usuarioGetter.grupo_ativo === CONST.PERFIL_COORDENADOR_GERAL)"
                                 :analisar="true"
                                 :dados="dadosTabelaTecnico"
                                 :componentes="listaAcoesCoordenador"
                                 :mostrar-tecnico="true"
+                                :loading="Object.keys(dadosTabelaTecnico).length === 0"
                             />
                             <TabelaProjetos
                                 v-else
                                 :analisar="true"
                                 :dados="dadosTabelaTecnico"
                                 :componentes="listaAcoesTecnico"
+                                :loading="Object.keys(dadosTabelaTecnico).length === 0"
                             />
                         </v-card-text>
                     </v-card>
@@ -161,19 +128,22 @@
                     <v-card flat>
                         <v-card-text>
                             <TabelaProjetos
-                                v-if="(getUsuario.grupo_ativo == CONST.PERFIL_COORDENADOR)"
+                                v-if="(usuarioGetter.grupo_ativo === CONST.PERFIL_COORDENADOR)"
                                 :dados="getProjetosAssinarCoordenador"
-                                :componentes="listaAcoesAssinar"
+                                :componentes="listaAcoesAssinarCoordenador"
+                                :loading="Object.keys(getProjetosAssinarCoordenador).length === 0"
                             />
                             <TabelaProjetos
-                                v-else-if="(getUsuario.grupo_ativo == CONST.PERFIL_COORDENADOR_GERAL)"
+                                v-else-if="(usuarioGetter.grupo_ativo === CONST.PERFIL_COORDENADOR_GERAL)"
                                 :dados="getProjetosAssinarCoordenadorGeral"
                                 :componentes="listaAcoesAssinarCoordenadorGeral"
+                                :loading="Object.keys(getProjetosAssinarCoordenadorGeral).length === 0"
                             />
                             <TabelaProjetos
                                 v-else
                                 :dados="getProjetosFinalizados"
                                 :componentes="listaAcoesAssinar"
+                                :loading="Object.keys(getProjetosFinalizados).length === 0"
                             />
                         </v-card-text>
                     </v-card>
@@ -188,6 +158,7 @@
                             <TabelaProjetos
                                 :dados="getProjetosHistorico"
                                 :componentes="historicoAcoes"
+                                :loading="Object.keys(getProjetosHistorico).length === 0"
                             />
                         </v-card-text>
                     </v-card>
@@ -220,7 +191,6 @@ export default {
     data() {
         return {
             tabActive: null,
-            dashboardItens: {},
             projetoAnaliseDados: { code: 300, items: [] },
             listaAcoesTecnico: {
                 atual: '',
@@ -234,11 +204,17 @@ export default {
                 ],
             },
             listaAcoesAssinar: {
-                usuario: this.getUsuario,
+                usuario: this.usuarioGetter,
                 atual: CONST.ESTADO_PARECER_FINALIZADO,
                 proximo: CONST.ESTADO_ANALISE_PARECER,
                 idTipoDoAtoAdministrativo: CONST.ATO_ADMINISTRATIVO_PARECER_TECNICO,
-                acoes: [Diligencias, Historico, AssinarButton, Devolver, VisualizarPlanilhaButtton, VisualizarParecer],
+                acoes: [
+                    Diligencias,
+                    AssinarButton,
+                    Historico,
+                    VisualizarPlanilhaButtton,
+                    VisualizarParecer,
+                ],
             },
             listaAcoesCoordenador: {
                 usuario: this.getUsuario,
@@ -252,12 +228,33 @@ export default {
                     VisualizarParecer,
                 ],
             },
+            listaAcoesAssinarCoordenador: {
+                usuario: this.usuarioGetter,
+                atual: CONST.ESTADO_AGUARDANDO_ASSINATURA_COORDENADOR_PARECER,
+                proximo: CONST.ESTADO_AGUARDANDO_ASSINATURA_COORDENADOR_GERAL_PARECER,
+                idTipoDoAtoAdministrativo: CONST.ATO_ADMINISTRATIVO_PARECER_TECNICO,
+                acoes: [
+                    Diligencias,
+                    AssinarButton,
+                    Devolver,
+                    Historico,
+                    VisualizarPlanilhaButtton,
+                    VisualizarParecer,
+                ],
+            },
             listaAcoesAssinarCoordenadorGeral: {
-                usuario: this.getUsuario,
+                usuario: this.usuarioGetter,
                 atual: CONST.ESTADO_AGUARDANDO_ASSINATURA_COORDENADOR_GERAL_PARECER,
                 proximo: CONST.ESTADO_ANALISE_PARECER,
                 idTipoDoAtoAdministrativo: CONST.ATO_ADMINISTRATIVO_PARECER_TECNICO,
-                acoes: [Diligencias, Historico, AssinarButton, Devolver, VisualizarPlanilhaButtton, VisualizarParecer],
+                acoes: [
+                    Diligencias,
+                    AssinarButton,
+                    Devolver,
+                    Historico,
+                    VisualizarPlanilhaButtton,
+                    VisualizarParecer,
+                ],
             },
             distribuirAcoes: { atual: '', proximo: '', acoes: [Encaminhar] },
             historicoAcoes: { atual: '', proximo: '', acoes: [Historico, VisualizarPlanilhaButtton] },
@@ -274,10 +271,8 @@ export default {
             getProjetosEmAssinatura: 'avaliacaoResultados/getProjetosEmAssinatura',
             getProjetosHistorico: 'avaliacaoResultados/getProjetosHistorico',
             getProjetosParaDistribuir: 'avaliacaoResultados/getProjetosParaDistribuir',
-            getUsuario: 'autenticacao/getUsuario',
             getProjetosAssinarCoordenador: 'avaliacaoResultados/getProjetosAssinarCoordenador',
             getProjetosAssinarCoordenadorGeral: 'avaliacaoResultados/getProjetosAssinarCoordenadorGeral',
-            getDashboard: 'avaliacaoResultados/getDashboardQuantidade',
             usuarioGetter: 'autenticacao/getUsuario',
             route: 'route',
         }),
@@ -290,85 +285,76 @@ export default {
                 this.tabActive = this.$route.meta.tab;
             },
         },
-        getDashboard: {
-            deep: true,
-            handler(val) {
-                this.dashboardItens = val.items;
-            },
-        },
     },
 
     created() {
         this.CONST = CONST;
-
-        let projetosTecnico = {};
-        let projetosFinalizados = {};
-
         const idSecretaria = this.usuarioGetter.usu_org_max_superior;
+        const isTecnico = this.usuarioGetter.grupo_ativo === CONST.PERFIL_TECNICO;
+        const isCoordenador = this.usuarioGetter.grupo_ativo === CONST.PERFIL_COORDENADOR;
+        const isCoordenadorGeral = this.usuarioGetter.grupo_ativo === CONST.PERFIL_COORDENADOR_GERAL;
 
-        if (
-            parseInt(this.getUsuario.grupo_ativo, 10) === parseInt(CONST.PERFIL_COORDENADOR, 10)
-            || parseInt(this.getUsuario.grupo_ativo, 10) === parseInt(CONST.PERFIL_COORDENADOR_GERAL, 10)
-        ) {
+        let projetosTecnico = {
+            estadoid: CONST.ESTADO_ANALISE_PARECER,
+            idAgente: this.usuarioGetter.usu_codigo,
+            idSecretaria,
+        };
+
+        let whereProjetosAssinatura = {
+            estadoid: CONST.ESTADO_PARECER_FINALIZADO,
+            idAgente: this.usuarioGetter.usu_codigo,
+            idSecretaria,
+        };
+
+        if (isCoordenador || isCoordenadorGeral) {
             projetosTecnico = {
-                estadoid: 5,
+                estadoid: CONST.ESTADO_ANALISE_PARECER,
                 idSecretaria,
             };
 
-            projetosFinalizados = {
-                estadoid: 6,
-                idSecretaria,
-            };
-        } else {
-            projetosTecnico = {
-                estadoid: 5,
-                idAgente: this.getUsuario.usu_codigo,
-                idSecretaria,
-            };
-
-            projetosFinalizados = {
-                estadoid: 6,
-                idAgente: this.getUsuario.usu_codigo,
+            whereProjetosAssinatura = {
+                estadoid: CONST.ESTADO_PARECER_FINALIZADO,
                 idSecretaria,
             };
         }
+        if (isTecnico) {
+            Vue.set(this.listaAcoesAssinar, 'usuario', this.usuarioGetter);
+        }
 
-        this.setDashboard();
-        this.distribuir();
+        if (isCoordenador) {
+            Vue.set(this.listaAcoesCoordenador, 'usuario', this.usuarioGetter);
+            Vue.set(this.listaAcoesAssinarCoordenador, 'usuario', this.usuarioGetter);
+            this.distribuir();
+            this.projetosAssinarCoordenador({
+                estadoid: CONST.ESTADO_AGUARDANDO_ASSINATURA_COORDENADOR_PARECER,
+                idSecretaria,
+            });
+        }
+
+        if (isCoordenadorGeral) {
+            this.distribuir();
+            this.projetosAssinarCoordenadorGeral({
+                estadoid: CONST.ESTADO_AGUARDANDO_ASSINATURA_COORDENADOR_GERAL_PARECER,
+                idSecretaria,
+            });
+            Vue.set(this.listaAcoesAssinarCoordenadorGeral, 'usuario', this.usuarioGetter);
+        }
+
         this.obterDadosTabelaTecnico(projetosTecnico);
-        this.projetosFinalizados(projetosFinalizados);
-        this.projetosAssinarCoordenador({
-            estadoid: 9,
-            idSecretaria,
-        });
-        this.projetosAssinarCoordenadorGeral({
-            estadoid: 15,
-            idSecretaria,
-        });
-
-        Vue.set(this.listaAcoesAssinar, 'usuario', this.getUsuario);
-        Vue.set(this.listaAcoesCoordenador, 'usuario', this.getUsuario);
-        Vue.set(this.listaAcoesAssinarCoordenadorGeral, 'usuario', this.getUsuario);
+        this.buscarProjetosAssinaturaAction(whereProjetosAssinatura);
     },
 
     methods: {
         ...mapActions({
             obterDadosTabelaTecnico: 'avaliacaoResultados/obterDadosTabelaTecnico',
-            projetosFinalizados: 'avaliacaoResultados/projetosFinalizados',
+            buscarProjetosAssinaturaAction: 'avaliacaoResultados/projetosFinalizados',
             projetosAssinaturaAction: 'avaliacaoResultados/projetosAssinatura',
             distribuir: 'avaliacaoResultados/projetosParaDistribuir',
             projetosAssinarCoordenador: 'avaliacaoResultados/projetosAssinarCoordenador',
             projetosAssinarCoordenadorGeral: 'avaliacaoResultados/projetosAssinarCoordenadorGeral',
-            setDashboard: 'avaliacaoResultados/dashboardQuantidades',
         }),
         r(val) {
             this.$router.push(val);
-        },
-        dashboard() {
-            return (typeof this.getDashboard !== 'undefined'
-                && Object.keys(this.getDashboard).length > 0)
-                ? this.getDashboard.items
-                : {};
         },
         buscarHistorico() {
             this.loadingHistorico = true;

@@ -26,7 +26,7 @@ import DadosReadequacoes from './visualizar/components/execucao/DadosReadequacoe
 import PedidoProrrogacao from './visualizar/components/execucao/PedidoProrrogacao';
 import DadosFiscalizacao from './visualizar/components/execucao/DadosFiscalizacao';
 import ContasBancarias from './visualizar/components/dadosBancarios/ContasBancarias';
-import ConciliacaoBancaria from './visualizar/components/dadosBancarios/ConciliacaoBancaria';
+import ConciliacaoBancariaView from './visualizar/components/dadosBancarios/ConciliacaoBancariaView';
 import InconsistenciaBancaria from './visualizar/components/dadosBancarios/InconsistenciaBancaria';
 import Liberacao from './visualizar/components/dadosBancarios/Liberacao';
 import SaldoContas from './visualizar/components/dadosBancarios/SaldoContas';
@@ -38,7 +38,7 @@ import PagamentosConsolidados from './visualizar/components/prestacaoContas/Paga
 import PagamentosUfMunicipio from './visualizar/components/prestacaoContas/PagamentosUfMunicipio';
 import ExecucaoReceitaDespesa from './visualizar/components/prestacaoContas/ExecucaoReceitaDespesa';
 import RelatorioFisico from './visualizar/components/prestacaoContas/RelatorioFisico';
-import RelacaoPagamento from './visualizar/components/prestacaoContas/RelacaoPagamento';
+import RelacaoPagamentoView from './visualizar/components/prestacaoContas/RelacaoPagamentoView';
 import RelatorioCumprimentoObjeto from './visualizar/components/prestacaoContas/RelatorioCumprimentoObjeto';
 import LaudoFinal from './visualizar/components/prestacaoContas/LaudoFinal';
 
@@ -289,7 +289,7 @@ const routes = [
             {
                 path: 'conciliacao-bancaria',
                 name: 'ConciliacaoBancaria',
-                component: ConciliacaoBancaria,
+                component: ConciliacaoBancariaView,
                 meta: {
                     title: 'Conciliação Bancária',
                 },
@@ -401,7 +401,7 @@ const routes = [
             {
                 path: 'relacao-pagamento',
                 name: 'RelacaoPagamento',
-                component: RelacaoPagamento,
+                component: RelacaoPagamentoView,
                 meta: {
                     title: 'Relação de Pagamentos',
                 },
