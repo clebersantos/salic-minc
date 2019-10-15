@@ -1,9 +1,11 @@
 <?php
+
 class Orgaos extends MinC_Db_Table_Abstract
 {
-    protected $_schema = 'SAC';
+    protected $_banco = 'SAC';
     protected $_name  = 'Orgaos';
     protected $_primary = 'Codigo';
+    protected $_schema = 'sac';
 
     const ORGAO_SUPERIOR_SAV = 160;
     const ORGAO_SUPERIOR_SEFIC = 251;
@@ -39,18 +41,18 @@ class Orgaos extends MinC_Db_Table_Abstract
         $select->setIntegrityCheck(false);
         $select->distinct();
         $select->from(
-                array('o'=>$this->_name),
-                array(
+            array('o' => $this->_name),
+            array(
                 'o.Codigo',
                 new Zend_Db_Expr('Tabelas.dbo.fnEstruturaOrgao(o.codigo, 0) as Sigla'),
                 'org.org_nomeautorizado'
-                )
+            )
         );
         $select->joinInner(
-                array('org'=>'vwUsuariosOrgaosGrupos'),
-                'org.uog_orgao = o.Codigo ',
-                array('org.org_nomeautorizado'),
-                'Tabelas.dbo'
+            array('org' => 'vwUsuariosOrgaosGrupos'),
+            'org.uog_orgao = o.Codigo ',
+            array('org.org_nomeautorizado'),
+            'Tabelas.dbo'
         );
         $select->where('o.Status = ?', 0);
         $select->where(new Zend_Db_Expr('o.idSecretaria IS NOT NULL'));
@@ -65,7 +67,7 @@ class Orgaos extends MinC_Db_Table_Abstract
         $select->setIntegrityCheck(false);
         $select->distinct();
         $select->from(
-            array('o'=>$this->_name),
+            array('o' => $this->_name),
             array(
                 'o.Codigo',
                 'o.Sigla',
@@ -90,12 +92,12 @@ class Orgaos extends MinC_Db_Table_Abstract
         $select = $this->select();
         $select->setIntegrityCheck(false);
         $select->from(
-                        array('o'=>$this->_name),
-                        array(
-                                'o.Codigo',
-                                'o.Sigla as NomeOrgao'
-                             )
-                     );
+            array('o' => $this->_name),
+            array(
+                'o.Codigo',
+                'o.Sigla as NomeOrgao'
+            )
+        );
         $select->where("o.Codigo = ?", $codOrgao);
         return $this->fetchAll($select);
     }
@@ -105,10 +107,10 @@ class Orgaos extends MinC_Db_Table_Abstract
         $select = $this->select();
         $select->setIntegrityCheck(false);
         $select->from(
-            array('o'=>$this->_name),
-                      array('o.Codigo',
-                            'o.Sigla',
-                            'o.idSecretaria as Superior')
+            array('o' => $this->_name),
+            array('o.Codigo',
+                'o.Sigla',
+                'o.idSecretaria as Superior')
         );
 
         $select->where("o.Codigo = ?", $codOrgao);
@@ -129,20 +131,20 @@ class Orgaos extends MinC_Db_Table_Abstract
         $slct = $this->select();
         $slct->setIntegrityCheck(false);
         $slct->from(
-                    array("o"=>$this->_name),
-                    array("Codigo", "Sigla")
-                    );
+            array("o" => $this->_name),
+            array("Codigo", "Sigla")
+        );
         $slct->joinInner(
-                        array("se"=>"Segmento"),
-                        "o.Codigo = se.idOrgao",
-                        array(),
-                        "SAC.dbo"
-                        );
+            array("se" => "Segmento"),
+            "o.Codigo = se.idOrgao",
+            array(),
+            "SAC.dbo"
+        );
 
         //adiciona quantos filtros foram enviados
         //$slct->where("se.stEstado = ?", 1);
         $slct->where("se.Codigo = ?", $segmento);
-        
+
         return $this->fetchAll($slct);
     }
 
@@ -178,15 +180,15 @@ class Orgaos extends MinC_Db_Table_Abstract
     public function buscarSuperintendencias()
     {
         $query = $this->select()
-               ->from(
-                   $this,
-                      array('Codigo', 'Sigla')
-               );
+            ->from(
+                $this,
+                array('Codigo', 'Sigla')
+            );
 
         $query->where('Vinculo = 1');
         $query->where('idSecretaria = ' . Orgaos::ORGAO_IPHAN_PRONAC);
         $query->order('Sigla');
-        
+
         return $this->fetchAll($query);
     }
 
@@ -202,11 +204,12 @@ class Orgaos extends MinC_Db_Table_Abstract
             self::ORGAO_SUPERIOR_SAV,
             self::ORGAO_SAV_DAP
         );
-        
+
         return (!in_array($idOrgao, $orgaos)) ? true : false;
     }
 
-    public function obterAreaParaEncaminhamentoPrestacao($codOrgao){
+    public function obterAreaParaEncaminhamentoPrestacao($codOrgao)
+    {
         $idOrgaoDestino = $codOrgao;
         $where = array();
 
@@ -237,7 +240,7 @@ class Orgaos extends MinC_Db_Table_Abstract
 
     public function obterUnidadeDestinoLaudoDaFinal($idUnidade)
     {
-        $idOrgaoSuperior = (int) $this->obterOrgaoSuperior($idUnidade)['Codigo'];
+        $idOrgaoSuperior = (int)$this->obterOrgaoSuperior($idUnidade)['Codigo'];
 
         switch ($idOrgaoSuperior) {
             case self::ORGAO_SUPERIOR_SAV:
@@ -250,12 +253,12 @@ class Orgaos extends MinC_Db_Table_Abstract
                 $idUnidade = \Orgaos::ORGAO_SEFIC_ARQ_CGEPC;
         }
 
-       return $idUnidade;
+        return $idUnidade;
     }
 
     public function obterNomeSecretariaPorExtenso($idUnidade)
     {
-        $idOrgaoSuperior = (int) $this->obterOrgaoSuperior($idUnidade)['Codigo'];
+        $idOrgaoSuperior = (int)$this->obterOrgaoSuperior($idUnidade)['Codigo'];
 
         switch ($idOrgaoSuperior) {
             case self::ORGAO_SUPERIOR_SAV:
@@ -300,4 +303,17 @@ class Orgaos extends MinC_Db_Table_Abstract
 
         return $unidadesVinculadas;
     }
+
+    public function obterNomeSecretariaEspecialPorExtenso($idUnidade)
+    {
+        $idOrgaoSuperior = (int)$this->obterOrgaoSuperior($idUnidade)['Codigo'];
+
+        $nome = 'SECRETARIA ESPECIAL DA CULTURA';
+        if ($idOrgaoSuperior == self::ORGAO_SUPERIOR_SGFT ) {
+            $nome = 'SECRETARIA EXECUTIVA';
+        }
+        return $nome;
+    }
+
+
 }

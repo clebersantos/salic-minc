@@ -1,202 +1,80 @@
 <template>
-    <carregando
-        v-if="Object.keys(dadosProjeto).length == 0"
-        text="Carregando ..."
-    />
-    <v-container
-        v-else
-        fluid
-    >
-        <v-toolbar>
-            <v-btn
-                icon
-                class="hidden-xs-only"
-                @click="goBack()"
-            >
-                <v-icon>arrow_back</v-icon>
-            </v-btn>
-            <v-toolbar-title>
-                Planilha: {{ dadosProjeto.items.pronac }} &#45; {{ dadosProjeto.items.nomeProjeto }}
-            </v-toolbar-title>
-            <v-spacer />
-
-            <v-chip v-if="isProjetoDiligenciado">
-                Projeto diligenciado
-            </v-chip>
-            <v-chip v-else-if="estado.estadoId === CONST.ESTADO_ANALISE_PARECER">
-                Projeto em analise
-            </v-chip>
-            <historico-diligencias
-                :id-pronac="idPronac"
-                :obj="dadosProjeto.items.diligencia"
-            />
-        </v-toolbar>
-        <v-card>
-            <v-card-text>
-                <v-alert
-                    v-if="documento != 0"
-                    :value="true"
-                    color="orange darken-3"
+    <div>
+        <planilha-avaliacao-financeira>
+            <template slot-scope="slotProps">
+                <v-data-table
+                    :headers="headers"
+                    :items="Object.values(slotProps.itens)"
+                    hide-actions
+                    disable-initial-sort
                 >
-                    Existe documento disponível para assinatura nesse projeto.
-                    <v-btn
-                        :href="'/assinatura/index/visualizar-projeto?idDocumentoAssinatura=' + documento.idDocumentoAssinatura"
-                        small
+                    <template
+                        slot="items"
+                        slot-scope="props"
                     >
-                        Ver documento
-                    </v-btn>
-                </v-alert>
-                <parecer-tecnico-planilha-header :dados="dadosProjeto" />
-            </v-card-text>
-            <v-card-actions>
-                <v-btn
-                    :href="'/consultardadosprojeto/index?idPronac=' + idPronac"
-                    target="_blank"
-                    class="mr-2"
-                >
-                    VER PROJETO
-                </v-btn>
-
-                <consolidacao-analise
-                    :id-pronac="idPronac"
-                    :nome-projeto="dadosProjeto.items.nomeProjeto"
-                    class="mr-2"
-                />
-
-                <relacao-pagamento-dialog
-                    :id-pronac="idPronac"
-                    class="mr-2"
-                />
-
-                <conciliacao-bancaria-dialog
-                    :id-pronac="idPronac"
-                    class="mr-2"
-                />
-            </v-card-actions>
-        </v-card>
-
-        <template v-if="!Object.keys(planilha).length">
-            <Carregando text="Carregando planilha ..." />
-        </template>
-        <template v-else>
-            <v-container
-                fluid
-                class="pa-0"
-            >
-                <v-flex
-                    xs12
-                    sm6
-                    class="py-2"
-                >
-                    <v-btn-toggle
-                        v-model="opcoesDeVisualizacao"
-                        multiple
-                    >
-                        <v-tooltip bottom>
-                            <v-btn
-                                slot="activator"
-                                flat
+                        <td>
+                            <v-tooltip
+                                bottom
                             >
-                                <v-icon>list</v-icon>
-                            </v-btn>
-                            <span>
-                                Apenas itens
-                            </span>
-                        </v-tooltip>
-                        <v-tooltip bottom>
+                                <v-progress-circular
+                                    v-if="props.item.qtComprovado > 0"
+                                    slot="activator"
+                                    style="margin: 1px 0px"
+                                    height="5"
+                                    :value="obterPercentualProgresso(props.item)"
+                                    :color="obterCorProgresso(props.item)"
+                                >
+                                    {{ props.item.qtComprovado }}
+                                </v-progress-circular>
+                                <span> {{ obterTextoProgresso(props.item) }} </span>
+                            </v-tooltip>
+                        </td>
+                        <td>{{ props.item.Seq }}</td>
+                        <td>
+                            {{ props.item.item }}
+                        </td>
+                        <td class="text-xs-right">
+                            {{ props.item.varlorAprovado | moedaMasc }}
+                        </td>
+                        <td class="text-xs-right">
+                            {{ props.item.varlorComprovado | moedaMasc }}
+                        </td>
+                        <td class="text-xs-right">
+                            {{ (props.item.varlorAprovado - props.item.varlorComprovado) | moedaMasc }}
+                        </td>
+                        <td>
                             <v-btn
-                                slot="activator"
-                                flat
+                                v-if="podeEditar(props.item.varlorComprovado)"
+                                color="primary"
+                                dark
+                                icon
+                                title="Avaliar comprovantes do item"
+                                @click="avaliarItem(props.item)"
                             >
-                                <v-icon>money_off</v-icon>
+                                <v-icon>
+                                    gavel
+                                </v-icon>
                             </v-btn>
-                            <span>
-                                Ocultar itens sem comprovação
-                            </span>
-                        </v-tooltip>
-                    </v-btn-toggle>
-                </v-flex>
-            </v-container>
-            <s-planilha
-                :array-planilha="planilha"
-                :list-items="mostrarListagem"
-                :agrupamentos="agrupamentos"
-                :totais="totaisPlanilha"
-            >
-                <template slot-scope="slotProps">
-                    <v-data-table
-                        :headers="headers"
-                        :items="Object.values(slotProps.itens)"
-                        hide-actions
-                        disable-initial-sort
-                    >
-                        <template
-                            slot="items"
-                            slot-scope="props"
-                        >
-                            <td>
-                                <v-tooltip
-                                    bottom
-                                >
-                                    <v-progress-circular
-                                        v-if="props.item.qtComprovado > 0"
-                                        slot="activator"
-                                        style="margin: 1px 0px"
-                                        height="5"
-                                        :value="obterPercentualProgresso(props.item)"
-                                        :color="obterCorProgresso(props.item)"
-                                    >
-                                        {{ props.item.qtComprovado }}
-                                    </v-progress-circular>
-                                    <span> {{ obterTextoProgresso(props.item) }} </span>
-                                </v-tooltip>
-                            </td>
-                            <td>
-                                {{ props.item.item }}
-                            </td>
-                            <td class="text-xs-right">
-                                {{ props.item.varlorAprovado | moedaMasc }}
-                            </td>
-                            <td class="text-xs-right">
-                                {{ props.item.varlorComprovado | moedaMasc }}
-                            </td>
-                            <td class="text-xs-right">
-                                {{ (props.item.varlorAprovado - props.item.varlorComprovado) | moedaMasc }}
-                            </td>
-                            <td>
-                                <v-btn
-                                    v-if="podeEditar(props.item.varlorComprovado)"
-                                    color="primary"
-                                    dark
-                                    icon
-                                    title="Avaliar comprovantes do item"
-                                    @click="avaliarItem(props.item)"
-                                >
-                                    <v-icon>
-                                        gavel
-                                    </v-icon>
-                                </v-btn>
-                            </td>
-                        </template>
-                    </v-data-table>
-                </template>
-            </s-planilha>
-            <analisar-item
-                v-if="isModalVisible === 'avaliacao-item'"
-                :id-pronac="idPronac"
-                :item="itemEmAvaliacao.item"
-                :descricao-produto="itemEmAvaliacao.produto"
-                :descricao-etapa="itemEmAvaliacao.etapa"
-                :uf="itemEmAvaliacao.Uf"
-                :produto="itemEmAvaliacao.cdProduto"
-                :idmunicipio="itemEmAvaliacao.cdCidade"
-                :etapa="itemEmAvaliacao.cdEtapa"
-                :cd-produto="itemEmAvaliacao.cdProduto"
-                :cd-uf="itemEmAvaliacao.cdUF"
-                :dt-inicio-execucao="dadosProjeto.items.dtInicioExecucao"
-                :dt-fim-execucao="dadosProjeto.items.dtFimExecucao"
-            />
-        </template>
+                        </td>
+                    </template>
+                </v-data-table>
+            </template>
+        </planilha-avaliacao-financeira>
+        <analisar-item
+            v-if="isModalVisible === 'avaliacao-item'"
+            :id-pronac="idPronac"
+            :item="itemEmAvaliacao.item"
+            :descricao-produto="itemEmAvaliacao.produto"
+            :descricao-etapa="itemEmAvaliacao.etapa"
+            :uf="itemEmAvaliacao.Uf"
+            :produto="itemEmAvaliacao.cdProduto"
+            :idmunicipio="itemEmAvaliacao.cdCidade"
+            :etapa="itemEmAvaliacao.cdEtapa"
+            :cd-produto="itemEmAvaliacao.cdProduto"
+            :cd-uf="itemEmAvaliacao.cdUF"
+            :dt-inicio-execucao="dadosProjeto.items.dtInicioExecucao"
+            :dt-fim-execucao="dadosProjeto.items.dtFimExecucao"
+        />
         <v-speed-dial
             v-if="(!isProjetoDiligenciado)"
             v-model="fab"
@@ -267,45 +145,34 @@
                 <span>Diligenciar</span>
             </v-tooltip>
         </v-speed-dial>
-    </v-container>
+    </div>
 </template>
 
 <script>
 import Vue from 'vue';
 import { mapActions, mapGetters } from 'vuex';
-import Carregando from '@/components/CarregandoVuetify';
-import ConsolidacaoAnalise from '../components/ConsolidacaoAnalise';
 import AnalisarItem from './AnalisarItem';
 import Moeda from '../../../../filters/money';
-import HistoricoDiligencias from '@/modules/avaliacaoResultados/components/components/HistoricoDiligencias';
-import ParecerTecnicoPlanilhaHeader from '@/modules/avaliacaoResultados/components/ParecerTecnico/PlanilhaHeader';
-import SPlanilha from '@/components/Planilha/PlanilhaV2';
 import CONST from '../../const';
-import RelacaoPagamentoDialog from '@/modules/projeto/visualizar/components/prestacaoContas/RelacaoPagamentoDialog';
-import ConciliacaoBancariaDialog
-    from '@/modules/projeto/visualizar/components/dadosBancarios/ConciliacaoBancariaDialog';
-
+import PlanilhaAvaliacaoFinanceira from '@/modules/avaliacaoResultados/components/planilha/PlanilhaAvaliacaoFinanceira';
 
 Vue.filter('moedaMasc', Moeda);
 
 export default {
     name: 'Planilha',
     components: {
-        ConciliacaoBancariaDialog,
-        RelacaoPagamentoDialog,
-        ParecerTecnicoPlanilhaHeader,
-        HistoricoDiligencias,
-        ConsolidacaoAnalise,
+        PlanilhaAvaliacaoFinanceira,
         AnalisarItem,
-        Carregando,
-        SPlanilha,
     },
     data() {
         return {
             CONST,
             headers: [
                 {
-                    text: '#', value: 'qtComprovado', sortable: true, align: 'left',
+                    text: 'Análise', value: 'qtComprovado', sortable: true, align: 'left', width: 0,
+                },
+                {
+                    text: '#', value: 'seq', sortable: true, width: 1,
                 },
                 { text: 'Item', value: 'item', sortable: true },
                 {
@@ -322,24 +189,19 @@ export default {
             fab: false,
             idPronac: this.$route.params.id,
             itemEmAvaliacao: {},
-            opcoesDeVisualizacao: [],
             agrupamentos: [
                 'Produto',
                 'descEtapa',
                 'uf',
                 'cidade',
             ],
-            totaisPlanilha: [
-                {
-                    label: 'Valor Aprovado',
-                    column: 'vlAprovado',
-                },
-            ],
+            totaisPlanilha: [],
+            mostrarListagem: false,
+            ocultarItensNaoComprovados: false,
         };
     },
     computed: {
         ...mapGetters({
-            getPlanilha: 'avaliacaoResultados/planilha',
             getProjetoAnalise: 'avaliacaoResultados/projetoAnalise',
             isModalVisible: 'modal/default',
         }),
@@ -350,50 +212,37 @@ export default {
             return {};
         },
         documento() {
+            if (!this.dadosProjeto.items) {
+                return 0;
+            }
+
             let { documento } = this.getProjetoAnalise.data.items;
             documento = documento !== null ? this.getProjetoAnalise.data.items.documento : 0;
             return documento;
         },
         estado() {
+            if (!this.dadosProjeto.items) {
+                return null;
+            }
+
             let { estado } = this.getProjetoAnalise.data.items;
             estado = (estado !== null) ? this.getProjetoAnalise.data.items.estado : 0;
             return estado;
         },
         isProjetoDiligenciado() {
+            if (!this.dadosProjeto.items) {
+                return false;
+            }
+
             const { diligencia } = this.dadosProjeto.items;
             return diligencia && diligencia.DtSolicitacao && !diligencia.DtResposta;
         },
-        mostrarListagem() {
-            return this.isOptionActive(0);
-        },
-        ocultarItensNaoComprovados() {
-            return this.isOptionActive(1);
-        },
-        planilha() {
-            let planilha = this.getPlanilha;
-            if (planilha === null || Object.keys(planilha).length === 0) {
-                return [];
-            }
-
-            if (this.ocultarItensNaoComprovados) {
-                planilha = this.getPlanilha.filter(item => item.varlorComprovado > 0);
-            }
-
-            return planilha;
-        },
-    },
-
-    mounted() {
-        this.buscarPlanilhaAction(this.idPronac);
-        this.buscarProjetoAnaliseAction(this.idPronac);
     },
 
     methods: {
         ...mapActions({
             modalOpen: 'modal/modalOpen',
             requestEmissaoParecer: 'avaliacaoResultados/getDadosEmissaoParecer',
-            buscarPlanilhaAction: 'avaliacaoResultados/syncPlanilhaAction',
-            buscarProjetoAnaliseAction: 'avaliacaoResultados/syncProjetoAction',
         }),
         getConsolidacao(id) {
             this.requestEmissaoParecer(id);
@@ -431,9 +280,6 @@ export default {
             } else {
                 this.$router.push('/');
             }
-        },
-        isOptionActive(index) {
-            return this.opcoesDeVisualizacao.includes(index);
         },
         obterPercentualProgresso(item) {
             return ((item.qtComprovadoValidado + item.qtComprovadoRecusada) / item.qtComprovado) * 100;
