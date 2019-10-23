@@ -314,5 +314,4 @@ class Orgaos extends MinC_Db_Table_Abstract
         }
         return $nome;
     }
-
 }
