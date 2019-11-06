@@ -305,6 +305,17 @@ class Orgaos extends MinC_Db_Table_Abstract
         return $nome;
     }
 
+    public function obterNomeSecretariaEspecialPorExtenso($idUnidade)
+    {
+        $idOrgaoSuperior = (int)$this->obterOrgaoSuperior($idUnidade)['Codigo'];
+
+        $nome = 'SECRETARIA ESPECIAL DA CULTURA';
+        if ($idOrgaoSuperior == self::ORGAO_SUPERIOR_SGFT ) {
+            $nome = 'SECRETARIA EXECUTIVA';
+        }
+        return $nome;
+    }
+
     public function obterUnidadesVinculadas($idOrgao)
     {
         $tbOrgaos = new \Orgaos();
@@ -334,16 +345,5 @@ class Orgaos extends MinC_Db_Table_Abstract
         }
 
         return $unidadesVinculadas;
-    }
-
-    public function obterNomeSecretariaEspecialPorExtenso($idUnidade)
-    {
-        $idOrgaoSuperior = (int)$this->obterOrgaoSuperior($idUnidade)['Codigo'];
-
-        $nome = 'SECRETARIA ESPECIAL DA CULTURA';
-        if ($idOrgaoSuperior == self::ORGAO_SUPERIOR_SGFT ) {
-            $nome = 'SECRETARIA EXECUTIVA';
-        }
-        return $nome;
     }
 }
